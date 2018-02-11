@@ -3,6 +3,6 @@ import Piece
 class Queen(Piece):
     movementRule
 
-    def __init__(self, position = None, idNumber, movementRule = None):
-        Piece.__init__(self, position, idNumber)
+    def __init__(self, position = None, idNumber, color, movementRule = None):
+        Piece.__init__(self, position, idNumber, color)
         self.movementRule = movementRule
