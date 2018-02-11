@@ -1,6 +1,6 @@
 import Piece
 
 class Pawn(Piece):
-    def __init__(self, position):
-        Piece.__init__(self, position)
-        
+
+    def __init__(self, position, idNumber):
+        Piece.__init__(self, position, idNumber)
