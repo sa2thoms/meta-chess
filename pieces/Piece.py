@@ -10,3 +10,4 @@ class Piece:
         self.position = position
         self.idNumber = idNumber
         self.color = color
+        self.symbol = symbol

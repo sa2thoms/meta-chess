@@ -1,4 +1,4 @@
-import pieces.Piece
+from pieces.Piece import Piece
 
 class Pawn(Piece):
 

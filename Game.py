@@ -1,17 +1,27 @@
-import RuleSet
-import pieces.Piece
-import pieces.Pawn
-import pieces.King
-import pieces.Queen
-import pieces.Rook
-import pieces.Knight
-import pieces.Bishop
-import NoRuleException
+from RuleSet import RuleSet
+from pieces.Piece import Piece
+from pieces.Pawn import Pawn
+from pieces.King import King
+from pieces.Queen import Queen
+from pieces.Rook import Rook
+from pieces.Knight import Knight
+from pieces.Bishop import Bishop
+from NoRuleException import NoRuleException
+
+class bcolors:
+    PINK = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class Game:
-    ruleSet
-    whitePieces
-    blackPieces
+    ruleSet = None
+    whitePieces = []
+    blackPieces = []
 
     COLOR_WHITE = 0
     COLOR_BLACK = 1
@@ -23,20 +33,17 @@ class Game:
         if (self.ruleSet == None):
             raise NoRuleException('There is no rule set from which to load the game')
 
-        if (self.whitePieces.count() == 0 and self.blackPieces.count() == 0):
+        if (len(self.whitePieces) != 0 or len(self.blackPieces) != 0):
             raise Exception('Game is already loaded')
 
-        self.whitePieces = []
-        self.blackPieces = []
-
         for i in range(0, 8):
-            whitePieces.append(Pawn(position=[i, 1], idNumber=i, color=self.COLOR_WHITE))
-            blackPieces.append(Pawn(position=[i, 6], idNumber=i, color=self.COLOR_BLACK))
+            self.whitePieces.append(Pawn(position=[i, 1], idNumber=i, color=self.COLOR_WHITE))
+            self.blackPieces.append(Pawn(position=[i, 6], idNumber=i, color=self.COLOR_BLACK))
 
         self._loadPowerPieces(self.COLOR_WHITE)
         self._loadPowerPieces(self.COLOR_BLACK)
 
-    def fullPrint():
+    def fullPrint(self):
         BOARD_FILE = './board.txt'
         with open(BOARD_FILE, 'r') as boardFile:
             template = boardFile.read()
@@ -45,13 +52,18 @@ class Game:
                 pieceAtLocation = self._getPiece([col, row])
                 symb = '  '
                 if pieceAtLocation != None:
-                    symb = pieceAtLocation.symbol
+                    colorCode = bcolors.BLUE
+                    if pieceAtLocation.color == self.COLOR_WHITE:
+                        colorCode = bcolors.PINK
+                    elif pieceAtLocation.color == self.COLOR_BLACK:
+                        colorCode = bcolors.GREEN
+                    symb = colorCode + pieceAtLocation.symbol + bcolors.ENDC
                 locationCode = chr(ord('A') + col) + chr(ord('0') + row)
-                template.replace(locationCode, symb)
+                template = template.replace(locationCode, symb)
         print(template)
                 
-    def _getPiece(position):
-        assert(position.count() == 2)
+    def _getPiece(self, position):
+        assert(len(position) == 2)
         for piece in self.whitePieces:
             if piece.position == position:
                 return piece
@@ -74,3 +86,5 @@ class Game:
         teamList.append(Bishop(position=[5, row], idNumber=13, color=color, movementRule=self.ruleSet.bishopMovement))
         teamList.append(Knight(position=[6, row], idNumber=14, color=color, movementRule=self.ruleSet.knightMovement))
         teamList.append(Rook(position=[7, row], idNumber=15, color=color, movementRule=self.ruleSet.rookMovement))
+
+        

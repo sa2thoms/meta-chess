@@ -1,5 +1,5 @@
-import Game
-import RuleSet
+from Game import Game
+from RuleSet import RuleSet
 
 def main():
     ruleSet = RuleSet(rookMovement=None, knightMovement=None, bishopMovement=None, queenMovement=None)

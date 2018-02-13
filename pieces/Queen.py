@@ -1,7 +1,7 @@
-import pieces.Piece
+from pieces.Piece import Piece
 
 class Queen(Piece):
-    movementRule
+    movementRule = None
 
     def __init__(self, position, idNumber, color, symbol='Qu', movementRule = None):
         Piece.__init__(self, position, idNumber, color, symbol)
