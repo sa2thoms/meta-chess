@@ -30,11 +30,35 @@ class Game:
         self.blackPieces = []
 
         for i in range(0, 8):
-            whitePieces.append(Pawn(position=[i, 1], idNumber=i, COLOR_WHITE))
-            blackPieces.append(Pawn(position=[i, 6], idNumber=i, COLOR_BLACK))
+            whitePieces.append(Pawn(position=[i, 1], idNumber=i, color=self.COLOR_WHITE))
+            blackPieces.append(Pawn(position=[i, 6], idNumber=i, color=self.COLOR_BLACK))
 
         self._loadPowerPieces(self.COLOR_WHITE)
         self._loadPowerPieces(self.COLOR_BLACK)
+
+    def fullPrint():
+        BOARD_FILE = './board.txt'
+        with open(BOARD_FILE, 'r') as boardFile:
+            template = boardFile.read()
+        for row in range(0, 8):
+            for col in range(0, 8):
+                pieceAtLocation = self._getPiece([col, row])
+                symb = '  '
+                if pieceAtLocation != None:
+                    symb = pieceAtLocation.symbol
+                locationCode = chr(ord('A') + col) + chr(ord('0') + row)
+                template.replace(locationCode, symb)
+        print(template)
+                
+    def _getPiece(position):
+        assert(position.count() == 2)
+        for piece in self.whitePieces:
+            if piece.position == position:
+                return piece
+        for piece in self.blackPieces:
+            if piece.position == position:
+                return piece
+        return None
 
     def _loadPowerPieces(self, color):
         row = color * 7
