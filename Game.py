@@ -1,11 +1,11 @@
 import RuleSet
-import Piece
-import Pawn
-import King
-import Queen
-import Rook
-import Knight
-import Bishop
+import pieces.Piece
+import pieces.Pawn
+import pieces.King
+import pieces.Queen
+import pieces.Rook
+import pieces.Knight
+import pieces.Bishop
 import NoRuleException
 
 class Game:

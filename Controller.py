@@ -1,7 +1,11 @@
 import Game
+import RuleSet
 
 def main():
-    game = Game()
+    ruleSet = RuleSet(rookMovement=None, knightMovement=None, bishopMovement=None, queenMovement=None)
+    game = Game(ruleSet)
+    game.loadPieces()
+    game.fullPrint()
 
 if __name__ == '__main__':
     main()

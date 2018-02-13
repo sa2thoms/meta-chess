@@ -1,12 +1,12 @@
-import MovementRule
+import pieces.MovementRule
 
 class Piece:
-    position
-    idNumber
-    color
-    symbol
+    position = None
+    idNumber = None
+    color = None
+    symbol = None
 
-    def __init__(self, position = None, idNumber, color, symbol):
+    def __init__(self, position, idNumber, color, symbol):
         self.position = position
         self.idNumber = idNumber
         self.color = color
