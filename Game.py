@@ -73,7 +73,23 @@ class Game:
         if validMs.fullMatch(moveString) == None:
             raise InvalidMoveStringException('Move string not valid')
 
-        # TODO: check validity of move and execute the move
+        spaceStrings = moveString.split(" to ")
+        for spaceString in spaceStrings:
+            spaceString.strip()
+        
+        spaceCodes = []
+        for spaceString in SpaceStrings:
+            col = ord(spaceString[0]) - ord('A')
+            row = ord(spaceString[1]) - ord('1')
+            spaceCodes.append([col, row])
+
+        pieceForMove = self._getPiece(spaceCodes[0])
+        if (pieceForMove == None):
+            raise IllegalMoveException('There is no piece at the starting location')
+        
+        if (isinstance(pieceForMove, Pawn)):
+            # Pawn case
+        # TODO: define cases for standard pieces and special pieces
                 
     def _getPiece(self, position):
         assert(len(position) == 2)
