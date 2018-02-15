@@ -6,7 +6,7 @@ class GameRepl:
     game = None
 
     def __init__(self, game = None):
-        if not game is Game:
+        if not isinstance(game, Game):
             raise TypeError('game must be of type Game')
         self.game = game
 
@@ -31,3 +31,6 @@ class GameRepl:
                 helpString = 'the requested move could not be understood. Make sure you give coordinates in the following format: A4 to B2\n\ntype \'/\' to preface any command, such as \'print\', which reprints the game\'s board\n\nPlease enter a new move: '
                 print(helpString, end="")
                 continue
+            
+            self.game.printBoard()
+            print(message, end="")

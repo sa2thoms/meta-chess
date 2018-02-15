@@ -29,6 +29,8 @@ class Game:
     COLOR_WHITE = 0
     COLOR_BLACK = 1
 
+    turn = 0 # white starts
+
     def __init__(self, ruleSet = None):
         self.ruleSet = ruleSet
 
@@ -48,6 +50,8 @@ class Game:
 
         self._loadPowerPieces(self.COLOR_WHITE)
         self._loadPowerPieces(self.COLOR_BLACK)
+
+        self.turn = self.COLOR_WHITE
 
     def printBoard(self):
         BOARD_FILE = './board.txt'
@@ -70,7 +74,7 @@ class Game:
 
     def move(self, moveString):
         validMs = re.compile(r'^\s*[A-H][1-8] +to +[A-H][1-8]\s*$')
-        if validMs.fullMatch(moveString) == None:
+        if validMs.fullmatch(moveString) == None:
             raise InvalidMoveStringException('Move string not valid')
 
         spaceStrings = moveString.split(" to ")
@@ -78,7 +82,7 @@ class Game:
             spaceString.strip()
         
         spaceCodes = []
-        for spaceString in SpaceStrings:
+        for spaceString in spaceStrings:
             col = ord(spaceString[0]) - ord('A')
             row = ord(spaceString[1]) - ord('1')
             spaceCodes.append([col, row])
@@ -86,9 +90,18 @@ class Game:
         pieceForMove = self._getPiece(spaceCodes[0])
         if (pieceForMove == None):
             raise IllegalMoveException('There is no piece at the starting location')
+        if (pieceForMove.color != self.turn):
+            raise IllegalMoveException('Wrong colored piece')
         
         if (isinstance(pieceForMove, Pawn)):
             # Pawn case
+            if (self.turn == self.COLOR_WHITE):
+                if (spaceCodes[1] == [spaceCodes[0][0], spaceCodes[0][1] + 1]):
+                    if (self._getPiece(spaceCodes[1]) != None):
+                        raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
+                    else:
+                        pieceForMove.position = spaceCodes[1]
+                
         # TODO: define cases for standard pieces and special pieces
                 
     def _getPiece(self, position):
