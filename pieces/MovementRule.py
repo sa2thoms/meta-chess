@@ -10,5 +10,4 @@ class MovementRule:
         self.allowsVerticalCartesian = vert
         self.allowsHorizontalCartesian = horiz
         self.allowsDiagonal = diag
-        self.jumpRules.append(jumps)
-    
+        self.jumpRules.extend(jumps)

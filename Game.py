@@ -7,6 +7,9 @@ from pieces.Rook import Rook
 from pieces.Knight import Knight
 from pieces.Bishop import Bishop
 from NoRuleException import NoRuleException
+from IllegalMoveException import IllegalMoveException
+from InvalidMoveStringException import InvalidMoveStringException
+import re
 
 class bcolors:
     PINK = '\033[95m'
@@ -29,7 +32,10 @@ class Game:
     def __init__(self, ruleSet = None):
         self.ruleSet = ruleSet
 
-    def loadPieces(self):
+    def isLoaded(self):
+        return len(self.whitePieces) > 0 or len(self.blackPieces) > 0
+
+    def load(self):
         if (self.ruleSet == None):
             raise NoRuleException('There is no rule set from which to load the game')
 
@@ -43,7 +49,7 @@ class Game:
         self._loadPowerPieces(self.COLOR_WHITE)
         self._loadPowerPieces(self.COLOR_BLACK)
 
-    def fullPrint(self):
+    def printBoard(self):
         BOARD_FILE = './board.txt'
         with open(BOARD_FILE, 'r') as boardFile:
             template = boardFile.read()
@@ -61,6 +67,13 @@ class Game:
                 locationCode = chr(ord('A') + col) + chr(ord('0') + row)
                 template = template.replace(locationCode, symb)
         print(template)
+
+    def move(self, moveString):
+        validMs = re.compile(r'^\s*[A-H][1-8] +to +[A-H][1-8]\s*$')
+        if validMs.fullMatch(moveString) == None:
+            raise InvalidMoveStringException('Move string not valid')
+
+        # TODO: check validity of move and execute the move
                 
     def _getPiece(self, position):
         assert(len(position) == 2)
