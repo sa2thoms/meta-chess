@@ -101,9 +101,27 @@ class Game:
                         raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                     else:
                         pieceForMove.position = spaceCodes[1]
+                        self._switchTurn()
+                elif (spaceCodes[1] == [spaceCodes[0][0], spaceCodes[0][1] + 2]):
+                    if (spaceCodes[0][1] != 1):
+                        raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
+                    if (self._getPiece(spaceCodes[1]) != None):
+                        raise IllegalMoveException('A pawn may not take a piece directly in front of it')
+                    if (self._getPiece([spaceCodes[0][0], spaceCodes[0][1] + 1]) != None):
+                        raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
+                    else:
+                        pieceForMove.position = spaceCodes[1]
+                        self._switchTurn()
+                
                 
         # TODO: define cases for standard pieces and special pieces
                 
+    def _switchTurn(self):
+        if (self.turn == self.COLOR_WHITE):
+            self.turn = self.COLOR_BLACK
+        else:
+            self.turn = self.COLOR_WHITE
+    
     def _getPiece(self, position):
         assert(len(position) == 2)
         for piece in self.whitePieces:
