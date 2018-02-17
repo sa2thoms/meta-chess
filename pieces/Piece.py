@@ -5,6 +5,7 @@ class Piece:
     idNumber = None
     color = None
     symbol = None
+    taken = False
 
     def __init__(self, position, idNumber, color, symbol):
         self.position = position

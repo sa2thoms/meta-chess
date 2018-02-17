@@ -21,11 +21,14 @@ class GameRepl:
         self.game.printBoard()
         print('\n' + message, end="")
         while True:
-            moveString = input()
+            moveString = input().strip()
+            if moveString[0] == '/':
+                self._executeCommands(moveString.lstrip('/'))
+                continue
             try:
                 self.game.move(moveString)
-            except IllegalMoveException:
-                print('\nThat move is not legal. Try again: ', end="")
+            except IllegalMoveException as e:
+                print('\nThat move is not legal: ' + e.message + '. Try again: ', end="")
                 continue
             except InvalidMoveStringException:
                 helpString = 'the requested move could not be understood. Make sure you give coordinates in the following format: A4 to B2\n\ntype \'/\' to preface any command, such as \'print\', which reprints the game\'s board\n\nPlease enter a new move: '
@@ -34,3 +37,9 @@ class GameRepl:
             
             self.game.printBoard()
             print(message, end="")
+
+    def _executeCommands(self, command):
+        if command == 'exit' or command == 'quit':
+            exit()
+        else:
+            print('Command not recognized. Please try again or enter your next move: ', end="")
