@@ -26,21 +26,19 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class Game:
-    ruleSet = None
-    whitePieces = []
-    blackPieces = []
-
-    COLOR_WHITE = 0
-    COLOR_BLACK = 1
-
-    turn = 0 # white starts
-
-    boardTemplate = None
-
-    moveHistory = []
 
     def __init__(self, ruleSet = None):
         self.ruleSet = ruleSet
+
+        self.whitePieces = []
+        self.blackPieces = []
+
+        self.COLOR_WHITE = 0
+        self.COLOR_BLACK = 1
+        self.turn = self.COLOR_WHITE
+
+        self.moveHistory = []
+
         BOARD_FILE = './board.txt'
         with open(BOARD_FILE, 'r') as boardFile:
             self.boardTemplate = boardFile.read()
@@ -56,8 +54,8 @@ class Game:
             raise Exception('Game is already loaded')
 
         for i in range(0, 8):
-            self.whitePieces.append(Pawn(position=[i, 1], idNumber=i, color=self.COLOR_WHITE))
-            self.blackPieces.append(Pawn(position=[i, 6], idNumber=i, color=self.COLOR_BLACK))
+            self.whitePieces.append(Pawn(position=[i, 1], color=self.COLOR_WHITE))
+            self.blackPieces.append(Pawn(position=[i, 6], color=self.COLOR_BLACK))
 
         self._loadPowerPieces(self.COLOR_WHITE)
         self._loadPowerPieces(self.COLOR_BLACK)
@@ -68,7 +66,7 @@ class Game:
         template = self.boardTemplate
         for row in range(0, 8):
             for col in range(0, 8):
-                pieceAtLocation = self._getPiece([col, row])
+                pieceAtLocation = self.getPiece([col, row])
                 symb = '  '
                 if pieceAtLocation != None:
                     colorCode = bcolors.BLUE
@@ -98,7 +96,7 @@ class Game:
 
         startPosition = spaceCodes[0]
         endPosition = spaceCodes[1]
-        pieceForMove = self._getPiece(startPosition)
+        pieceForMove = self.getPiece(startPosition)
         if (pieceForMove == None):
             raise IllegalMoveException('There is no piece at the starting location')
         if (pieceForMove.color != self.turn):
@@ -116,7 +114,7 @@ class Game:
         else:
             self.turn = self.COLOR_WHITE
     
-    def _getPiece(self, position):
+    def getPiece(self, position):
         assert(len(position) == 2)
         for piece in self.whitePieces:
             if piece.position == position and piece.taken == False:
@@ -132,20 +130,20 @@ class Game:
         if color == self.COLOR_BLACK:
             teamList = self.blackPieces
 
-        teamList.append(Rook(position=[0, row], idNumber=8, color=color, movementRule=self.ruleSet.rookMovement))
-        teamList.append(Knight(position=[1, row], idNumber=9, color=color, movementRule=self.ruleSet.knightMovement))
-        teamList.append(Bishop(position=[2, row], idNumber=10, color=color, movementRule=self.ruleSet.bishopMovement))
-        teamList.append(Queen(position=[3, row], idNumber=11, color=color, movementRule=self.ruleSet.queenMovement))
-        teamList.append(King(position=[4, row], idNumber=12, color=color))
-        teamList.append(Bishop(position=[5, row], idNumber=13, color=color, movementRule=self.ruleSet.bishopMovement))
-        teamList.append(Knight(position=[6, row], idNumber=14, color=color, movementRule=self.ruleSet.knightMovement))
-        teamList.append(Rook(position=[7, row], idNumber=15, color=color, movementRule=self.ruleSet.rookMovement))
+        teamList.append(Rook(position=[0, row], color=color, movementRule=self.ruleSet.rookMovement))
+        teamList.append(Knight(position=[1, row], color=color, movementRule=self.ruleSet.knightMovement))
+        teamList.append(Bishop(position=[2, row], color=color, movementRule=self.ruleSet.bishopMovement))
+        teamList.append(Queen(position=[3, row], color=color, movementRule=self.ruleSet.queenMovement))
+        teamList.append(King(position=[4, row], color=color))
+        teamList.append(Bishop(position=[5, row], color=color, movementRule=self.ruleSet.bishopMovement))
+        teamList.append(Knight(position=[6, row], color=color, movementRule=self.ruleSet.knightMovement))
+        teamList.append(Rook(position=[7, row], color=color, movementRule=self.ruleSet.rookMovement))
 
     def _pawnMove(self, pieceForMove, startPosition, endPosition):
         assert(isinstance(pieceForMove, Pawn))
         if (self.turn == self.COLOR_WHITE):
             if (endPosition == [startPosition[0], startPosition[1] + 1]):
-                if (self._getPiece(endPosition) != None):
+                if (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
                     pieceForMove.position = endPosition
@@ -155,9 +153,9 @@ class Game:
             elif (endPosition == [startPosition[0], startPosition[1] + 2]):
                 if (startPosition[1] != 1):
                     raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
-                if (self._getPiece(endPosition) != None):
+                if (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('A pawn may not take a piece directly in front of it')
-                if (self._getPiece([startPosition[0], startPosition[1] + 1]) != None):
+                if (self.getPiece([startPosition[0], startPosition[1] + 1]) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
                     pieceForMove.position = endPosition
@@ -165,12 +163,12 @@ class Game:
                     record = MoveRecord(startPosition, endPosition, pieceForMove)
                     self.moveHistory.append(record)
             elif (startPosition[1] + 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
-                if (self._getPiece(endPosition) == None):
+                if (self.getPiece(endPosition) == None):
                     raise IllegalMoveException('Pawns can only move diagonally to take')
-                if (self._getPiece(endPosition).color == self.COLOR_WHITE):
+                if (self.getPiece(endPosition).color == self.COLOR_WHITE):
                     raise IllegalMoveException('You may not take your own piece')
                 else:
-                    takenPiece = self._getPiece(endPosition)
+                    takenPiece = self.getPiece(endPosition)
                     takenPiece.taken = True
                     pieceForMove.position = endPosition
                     self._switchTurn()
@@ -178,7 +176,7 @@ class Game:
                     self.moveHistory.append(record)
         if (self.turn == self.COLOR_BLACK):
             if (endPosition == [startPosition[0], startPosition[1] - 1]):
-                if (self._getPiece(endPosition) != None):
+                if (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
                     pieceForMove.position = endPosition
@@ -188,9 +186,9 @@ class Game:
             elif (endPosition == [startPosition[0], startPosition[1] - 2]):
                 if (startPosition[1] != 6):
                     raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
-                if (self._getPiece(endPosition) != None):
+                if (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('A pawn may not take a piece directly in front of it')
-                if (self._getPiece([startPosition[0], startPosition[1] - 1]) != None):
+                if (self.getPiece([startPosition[0], startPosition[1] - 1]) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
                     pieceForMove.position = endPosition
@@ -198,12 +196,12 @@ class Game:
                     record = MoveRecord(startPosition, endPosition, pieceForMove)
                     self.moveHistory.append(record)
             elif (startPosition[1] - 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
-                if (self._getPiece(endPosition) == None):
+                if (self.getPiece(endPosition) == None):
                     raise IllegalMoveException('Pawns can only move diagonally to take')
-                if (self._getPiece(endPosition).color == self.COLOR_BLACK):
+                if (self.getPiece(endPosition).color == self.COLOR_BLACK):
                     raise IllegalMoveException('You may not take your own piece')
                 else:
-                    takenPiece = self._getPiece(endPosition)
+                    takenPiece = self.getPiece(endPosition)
                     takenPiece.taken = True
                     pieceForMove.position = endPosition
                     self._switchTurn()

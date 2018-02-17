@@ -3,7 +3,6 @@ from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
 
 class GameRepl:
-    game = None
 
     def __init__(self, game = None):
         if not isinstance(game, Game):

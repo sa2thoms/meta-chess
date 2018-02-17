@@ -7,10 +7,6 @@ from pieces.Knight import Knight
 from pieces.Bishop import Bishop
 
 class MoveRecord:
-    startPosition = None
-    endPosition = None
-    pieceInMotion = None
-    pieceTaken = None
 
     def __init__(self, startPosition, endPosition, pieceInMotion, pieceTaken = None):
         self.startPosition = startPosition

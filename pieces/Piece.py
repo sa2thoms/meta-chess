@@ -1,14 +1,9 @@
 import pieces.MovementRule
 
 class Piece:
-    position = None
-    idNumber = None
-    color = None
-    symbol = None
-    taken = False
 
-    def __init__(self, position, idNumber, color, symbol):
+    def __init__(self, position = None, color = None, symbol = None):
         self.position = position
-        self.idNumber = idNumber
         self.color = color
         self.symbol = symbol
+        self.taken = False
