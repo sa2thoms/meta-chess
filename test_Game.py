@@ -46,12 +46,3 @@ def test_that_load_loads_pieces():
     assert len(game.whitePieces) == 16
     assert len(game.blackPieces) == 16
     assert isinstance(game.whitePieces[0], Pawn)
-
-def test_that_move_moves_pawn_two_forward():
-    ruleSet = RuleSet(None, None, None, None)
-    game = Game(ruleSet)
-    game.load()
-    game.move('D2 to D4')
-    assert isinstance(game.getPiece([3, 3]), Pawn)
-    assert game.getPiece([3, 1]) == None
-
