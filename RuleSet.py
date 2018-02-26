@@ -1,4 +1,4 @@
-import pieces.MovementRule
+from pieces.MovementRule import MovementRule
 
 class RuleSet:
 
