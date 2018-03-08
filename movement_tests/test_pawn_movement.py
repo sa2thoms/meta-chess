@@ -54,3 +54,41 @@ def test_that_blocked_pawn_does_not_move_two_spaces():
         game.move('D7 to D5')
     assert isinstance(game.getPiece([3, 6]), Pawn)
     assert game.getPiece([3, 4]) == None
+
+def test_that_pawn_does_not_move_two_forward_from_wrong_row():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.move('D2 to D4')
+    game.move('A7 to A5')
+    with pytest.raises(IllegalMoveException):
+        game.move('D4 to D6')
+    assert isinstance(game.getPiece([3, 3]), Pawn)
+    assert game.getPiece([3, 5]) == None
+
+def test_that_pawn_takes_en_passant():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.move('D2 to D4')
+    game.move('A7 to A5')
+    game.move('D4 to D5')
+    game.move('E7 to E5')
+    game.move('D5 to E6')
+    assert isinstance(game.getPiece([4, 5]), Pawn)
+    assert game.getPiece([4, 5]).color == game.COLOR_WHITE
+    assert game.getPiece([4, 4]) == None
+
+def test_that_black_pawn_takes_en_passant():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.move('D2 to D4')
+    game.move('A7 to A5')
+    game.move('D4 to D5')
+    game.move('A5 to A4')
+    game.move('B2 to B4')
+    game.move('A4 to B3')
+    assert isinstance(game.getPiece([1, 2]), Pawn)
+    assert game.getPiece([1, 2]).color == game.COLOR_BLACK
+    assert game.getPiece([1, 3]) == None

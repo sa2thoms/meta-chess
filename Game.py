@@ -153,9 +153,9 @@ class Game:
             elif (endPosition == [startPosition[0], startPosition[1] + 2]):
                 if (startPosition[1] != 1):
                     raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
-                if (self.getPiece(endPosition) != None):
+                elif (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('A pawn may not take a piece directly in front of it')
-                if (self.getPiece([startPosition[0], startPosition[1] + 1]) != None):
+                elif (self.getPiece([startPosition[0], startPosition[1] + 1]) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
                     pieceForMove.position = endPosition
@@ -164,8 +164,18 @@ class Game:
                     self.moveHistory.append(record)
             elif (startPosition[1] + 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
                 if (self.getPiece(endPosition) == None):
-                    raise IllegalMoveException('Pawns can only move diagonally to take')
-                if (self.getPiece(endPosition).color == self.COLOR_WHITE):
+                    previousMove = self.moveHistory[-1]
+                    if (startPosition[1] == 4 and previousMove.startPosition == [endPosition[0], 6] and previousMove.endPosition == [endPosition[0], 4] and isinstance(previousMove.pieceInMotion, Pawn)):
+                        # This is where the pawn takes en passant
+                        takenPiece = previousMove.pieceInMotion
+                        takenPiece.taken = True
+                        pieceForMove.position = endPosition
+                        self._switchTurn()
+                        record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
+                        self.moveHistory.append(record)
+                    else:
+                        raise IllegalMoveException('Pawns can only move diagonally to take')
+                elif (self.getPiece(endPosition).color == self.COLOR_WHITE):
                     raise IllegalMoveException('You may not take your own piece')
                 else:
                     takenPiece = self.getPiece(endPosition)
@@ -174,7 +184,7 @@ class Game:
                     self._switchTurn()
                     record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
                     self.moveHistory.append(record)
-        if (self.turn == self.COLOR_BLACK):
+        elif (self.turn == self.COLOR_BLACK):
             if (endPosition == [startPosition[0], startPosition[1] - 1]):
                 if (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
@@ -186,9 +196,9 @@ class Game:
             elif (endPosition == [startPosition[0], startPosition[1] - 2]):
                 if (startPosition[1] != 6):
                     raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
-                if (self.getPiece(endPosition) != None):
+                elif (self.getPiece(endPosition) != None):
                     raise IllegalMoveException('A pawn may not take a piece directly in front of it')
-                if (self.getPiece([startPosition[0], startPosition[1] - 1]) != None):
+                elif (self.getPiece([startPosition[0], startPosition[1] - 1]) != None):
                     raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
                     pieceForMove.position = endPosition
@@ -197,8 +207,18 @@ class Game:
                     self.moveHistory.append(record)
             elif (startPosition[1] - 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
                 if (self.getPiece(endPosition) == None):
-                    raise IllegalMoveException('Pawns can only move diagonally to take')
-                if (self.getPiece(endPosition).color == self.COLOR_BLACK):
+                    previousMove = self.moveHistory[-1]
+                    if (startPosition[1] == 3 and previousMove.startPosition == [endPosition[0], 1] and previousMove.endPosition == [endPosition[0], 3] and isinstance(previousMove.pieceInMotion, Pawn)):
+                        # This is where the pawn takes en passant
+                        takenPiece = previousMove.pieceInMotion
+                        takenPiece.taken = True
+                        pieceForMove.position = endPosition
+                        self._switchTurn()
+                        record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
+                        self.moveHistory.append(record)
+                    else:
+                        raise IllegalMoveException('Pawns can only move diagonally to take')
+                elif (self.getPiece(endPosition).color == self.COLOR_BLACK):
                     raise IllegalMoveException('You may not take your own piece')
                 else:
                     takenPiece = self.getPiece(endPosition)
