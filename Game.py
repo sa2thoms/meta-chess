@@ -99,14 +99,15 @@ class Game:
         pieceForMove = self.getPiece(startPosition)
         if (pieceForMove == None):
             raise IllegalMoveException('There is no piece at the starting location')
-        if (pieceForMove.color != self.turn):
+        elif (pieceForMove.color != self.turn):
             raise IllegalMoveException('Wrong colored piece')
+        elif (startPosition == endPosition):
+            raise IllegalMoveException('The piece cannot move to where it already was')
         
         if (isinstance(pieceForMove, Pawn)):
             self._pawnMove(pieceForMove, startPosition, endPosition)
-
-
-
+        elif (isinstance(pieceForMove, King)):
+            self._kingMove(pieceForMove, startPosition, endPosition)
                 
     def _switchTurn(self):
         if (self.turn == self.COLOR_WHITE):
@@ -227,3 +228,33 @@ class Game:
                     self._switchTurn()
                     record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
                     self.moveHistory.append(record)
+
+    def _kingMove(self, pieceForMove, startPosition, endPosition):
+        if (self.turn == self.COLOR_WHITE):
+            if (abs(endPosition[0] - startPosition[0]) <= 1 and abs(endPosition[1] - startPosition[1]) <= 1):
+                if (self.getPiece(endPosition) != None and self.getPiece(endPosition).color == self.COLOR_WHITE):
+                    raise IllegalMoveException('You may not take your own piece')
+                else:
+                    takenPiece = self.getPiece(endPosition)
+                    if (takenPiece != None):
+                        takenPiece.taken = True
+                    pieceForMove.position = endPosition
+                    self._switchTurn()
+                    record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
+                    self.moveHistory.append(record)
+            else:
+                raise IllegalMoveException('A king may only move one square in any direction')
+        elif (self.turn == self.COLOR_BLACK):
+            if (abs(endPosition[0] - startPosition[0]) <= 1 and abs(endPosition[1] - startPosition[1]) <= 1):
+                if (self.getPiece(endPosition).color == self.COLOR_BLACK):
+                    raise IllegalMoveException('You may not take your own piece')
+                else:
+                    takenPiece = self.getPiece(endPosition)
+                    if (takenPiece != None):
+                        takenPiece.taken = True
+                    pieceForMove.position = endPosition
+                    self._switchTurn()
+                    record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
+                    self.moveHistory.append(record)
+            else:
+                raise IllegalMoveException('A king may only move one square in any direction')
