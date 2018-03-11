@@ -54,3 +54,14 @@ def test_that_blocked_pawn_does_not_move_two_spaces():
         game.move('D7 to D5')
     assert isinstance(game.getPiece([3, 6]), Pawn)
     assert game.getPiece([3, 4]) == None
+
+def test_that_pawn_does_not_take_forward():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.move('D2 to D4')
+    game.move('D7 to D5')
+    with pytest.raises(IllegalMoveException):
+        game.move('D4 to D5')
+    assert isinstance(game.getPiece([3, 3]), Pawn)
+    assert isinstance(game.getPiece([3, 4]), Pawn)
