@@ -2,3 +2,6 @@
 *__pycache__/
 .vscode/
 .pytest_cache/
+
+#Compiled Python File
+*.pyc
