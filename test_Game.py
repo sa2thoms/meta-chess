@@ -46,3 +46,44 @@ def test_that_load_loads_pieces():
     assert len(game.whitePieces) == 16
     assert len(game.blackPieces) == 16
     assert isinstance(game.whitePieces[0], Pawn)
+
+def test_that_move_throws_exception_for_invalid_move_string():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    with pytest.raises(InvalidMoveStringException):
+        game.move('NotAValid MoveString to Duh')
+
+def test_that_isValidMove_returns_true_for_a_valid_move():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    assert game.isValidMove('D2 to D4') == True
+    assert game.isValidMove([[0, 1], [0, 3]]) == True
+
+def test_that_isValidMove_returns_false_for_an_invalid_move():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    assert game.isValidMove('D2 to E3') == False
+    assert game.isValidMove([[4, 0], [4, 1]]) == False
+
+def test_that_isKingAttacked_returns_true_when_the_king_is_attacked():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.move('D2 to D4')
+    game.move('E7 to E5')
+    game.move('D4 to E5')
+    game.move('A7 to A5')
+    game.move('E5 to E6')
+    assert game.isKingAttacked(game.COLOR_BLACK) == False
+    game.move('A5 to A4')
+    game.move('E6 to D7')
+    assert game.isKingAttacked(game.COLOR_BLACK) == True
+
+def test_that_isKingAttacked_returns_false_when_the_king_is_not_attacked():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.isKingAttacked(game.COLOR_WHITE) == False

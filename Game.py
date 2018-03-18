@@ -79,7 +79,8 @@ class Game:
                 template = template.replace(locationCode, symb)
         print(template)
 
-    def move(self, moveString):
+    def _moveFromMoveString(self, moveString):
+        assert isinstance(moveString, str)
         validMs = re.compile(r'^\s*[A-H][1-8] +to +[A-H][1-8]\s*$')
         if validMs.fullmatch(moveString) == None:
             raise InvalidMoveStringException('Move string not valid')
@@ -93,9 +94,13 @@ class Game:
             col = ord(spaceString[0]) - ord('A')
             row = ord(spaceString[1]) - ord('1')
             spaceCodes.append([col, row])
-
+        return spaceCodes
+    
+    def move(self, moveString):
+        spaceCodes = self._moveFromMoveString(moveString)
         startPosition = spaceCodes[0]
         endPosition = spaceCodes[1]
+
         pieceForMove = self.getPiece(startPosition)
         if (pieceForMove == None):
             raise IllegalMoveException('There is no piece at the starting location')
@@ -108,7 +113,30 @@ class Game:
             self._pawnMove(pieceForMove, startPosition, endPosition)
         elif (isinstance(pieceForMove, King)):
             self._kingMove(pieceForMove, startPosition, endPosition)
-                
+
+    def isValidMove(self, move):
+        if (isinstance(move, str)):
+            return self._checkMoveValidity(self._moveFromMoveString(move))
+        else:
+            return self._checkMoveValidity(move)
+
+    def _checkMoveValidity(self, move):
+        startPosition = move[0]
+        endPosition = move[1]
+
+        pieceForMove = self.getPiece(startPosition)
+        if (pieceForMove == None):
+            return False
+        elif (pieceForMove.color != self.turn):
+            return False
+        elif (startPosition == endPosition):
+            return False
+
+        elif (isinstance(pieceForMove, Pawn)):
+            self._checkPawnValidity
+        elif (isinstance(pieceForMove, King)):
+            self._checkKingValidity
+
     def _switchTurn(self):
         if (self.turn == self.COLOR_WHITE):
             self.turn = self.COLOR_BLACK
@@ -139,6 +167,63 @@ class Game:
         teamList.append(Bishop(position=[5, row], color=color, movementRule=self.ruleSet.bishopMovement))
         teamList.append(Knight(position=[6, row], color=color, movementRule=self.ruleSet.knightMovement))
         teamList.append(Rook(position=[7, row], color=color, movementRule=self.ruleSet.rookMovement))
+
+    def _checkPawnValidity(self, pieceForMove, startPosition, endPosition):
+        if (self.turn == self.COLOR_WHITE):
+            if (endPosition == [startPosition[0], startPosition[1] + 1]):
+                if (self.getPiece(endPosition) != None):
+                    return False
+                else:
+                    return True
+            elif (endPosition == [startPosition[0], startPosition[1] + 2]):
+                if (startPosition[1] != 1):
+                    return False
+                elif (self.getPiece(endPosition) != None):
+                    return False
+                elif (self.getPiece([startPosition[0], startPosition[1] + 1]) != None):
+                    return False
+                else:
+                    return True
+            elif (startPosition[1] + 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
+                if (self.getPiece(endPosition) == None):
+                    previousMove = self.moveHistory[-1]
+                    if (startPosition[1] == 4 and previousMove.startPosition == [endPosition[0], 6] and previousMove.endPosition == [endPosition[0], 4] and isinstance(previousMove.pieceInMotion, Pawn)):
+                        # This is where the pawn takes en passant
+                        return True
+                    else:
+                        return False
+                elif (self.getPiece(endPosition).color == self.COLOR_WHITE):
+                    return False
+                else:
+                    return True
+        elif (self.turn == self.COLOR_BLACK):
+            if (endPosition == [startPosition[0], startPosition[1] - 1]):
+                if (self.getPiece(endPosition) != None):
+                    return False
+                else:
+                    return True
+            elif (endPosition == [startPosition[0], startPosition[1] - 2]):
+                if (startPosition[1] != 6):
+                    return False
+                elif (self.getPiece(endPosition) != None):
+                    return False
+                elif (self.getPiece([startPosition[0], startPosition[1] - 1]) != None):
+                    return False
+                else:
+                    return True
+            elif (startPosition[1] - 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
+                if (self.getPiece(endPosition) == None):
+                    previousMove = self.moveHistory[-1]
+                    if (startPosition[1] == 3 and previousMove.startPosition == [endPosition[0], 1] and previousMove.endPosition == [endPosition[0], 3] and isinstance(previousMove.pieceInMotion, Pawn)):
+                        # This is where the pawn takes en passant
+                        return True
+                    else:
+                        return False
+                elif (self.getPiece(endPosition).color == self.COLOR_BLACK):
+                    return False
+                else:
+                    return True
+
 
     def _pawnMove(self, pieceForMove, startPosition, endPosition):
         assert(isinstance(pieceForMove, Pawn))
