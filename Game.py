@@ -133,9 +133,9 @@ class Game:
             return False
 
         elif (isinstance(pieceForMove, Pawn)):
-            self._checkPawnValidity
+            return self._checkPawnValidity(pieceForMove, startPosition, endPosition)
         elif (isinstance(pieceForMove, King)):
-            self._checkKingValidity
+            return self._checkKingValidity(pieceForMove, startPosition, endPosition)
 
     def _switchTurn(self):
         if (self.turn == self.COLOR_WHITE):
@@ -186,6 +186,8 @@ class Game:
                     return True
             elif (startPosition[1] + 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
                 if (self.getPiece(endPosition) == None):
+                    if (len(self.moveHistory) == 0):
+                        return False
                     previousMove = self.moveHistory[-1]
                     if (startPosition[1] == 4 and previousMove.startPosition == [endPosition[0], 6] and previousMove.endPosition == [endPosition[0], 4] and isinstance(previousMove.pieceInMotion, Pawn)):
                         # This is where the pawn takes en passant
@@ -213,6 +215,8 @@ class Game:
                     return True
             elif (startPosition[1] - 1 == endPosition[1] and abs(startPosition[0] - endPosition[0]) == 1):
                 if (self.getPiece(endPosition) == None):
+                    if (len(self.moveHistory) == 0):
+                        return False
                     previousMove = self.moveHistory[-1]
                     if (startPosition[1] == 3 and previousMove.startPosition == [endPosition[0], 1] and previousMove.endPosition == [endPosition[0], 3] and isinstance(previousMove.pieceInMotion, Pawn)):
                         # This is where the pawn takes en passant
@@ -313,6 +317,24 @@ class Game:
                     self._switchTurn()
                     record = MoveRecord(startPosition, endPosition, pieceForMove, takenPiece)
                     self.moveHistory.append(record)
+
+    def _checkKingValidity(self, pieceForMove, startPosition, endPosition):
+        if (self.turn == self.COLOR_WHITE):
+            if (abs(endPosition[0] - startPosition[0]) <= 1 and abs(endPosition[1] - startPosition[1]) <= 1):
+                if (self.getPiece(endPosition) != None and self.getPiece(endPosition).color == self.COLOR_WHITE):
+                    return False
+                else:
+                    return True
+            else:
+                return False
+        elif (self.turn == self.COLOR_BLACK):
+            if (abs(endPosition[0] - startPosition[0]) <= 1 and abs(endPosition[1] - startPosition[1]) <= 1):
+                if (self.getPiece(endPosition).color == self.COLOR_BLACK):
+                    return False
+                else:
+                    return True
+            else:
+                return False
 
     def _kingMove(self, pieceForMove, startPosition, endPosition):
         if (self.turn == self.COLOR_WHITE):
