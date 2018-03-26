@@ -87,3 +87,22 @@ def test_that_isKingAttacked_returns_false_when_the_king_is_not_attacked():
     game = Game(ruleSet)
     game.load()
     game.isKingAttacked(game.COLOR_WHITE) == False
+
+def test_that_isAttacking_returns_true_when_piece_attacking():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    game.move('E2 to E4')
+    game.move('D7 to D5')
+    assert game.isAttacking('E4 to D5') == True
+    assert game.isAttacking([[3, 4], [4, 3]]) == True
+    assert game.isAttacking([[4, 0], [3, 1]]) == True
+    
+
+def test_that_isAttacking_returns_false_when_piece_not_attacking():
+    ruleSet = RuleSet(None, None, None, None)
+    game = Game(ruleSet)
+    game.load()
+    assert game.isAttacking('E4 to D5') == False
+    assert game.isAttacking([[0, 1], [1, 2]]) == False
+    assert game.isAttacking([[4, 7], [4, 5]]) == False

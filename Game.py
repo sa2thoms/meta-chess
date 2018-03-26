@@ -120,6 +120,20 @@ class Game:
         else:
             return self._checkMoveValidity(move)
 
+    def isAttacking(self, move):
+        moveArray = move
+        if (isinstance(move, str)):
+            moveArray = self._moveFromMoveString(move)
+        
+        pieceForMove = self.getPiece(moveArray[0])
+        if (pieceForMove.color == self.turn):
+            return self._checkMoveValidity(moveArray)
+        else:
+            self._switchTurn()
+            ret = self._checkMoveValidity(moveArray)
+            self._switchTurn()
+            return ret
+
     def _checkMoveValidity(self, move):
         startPosition = move[0]
         endPosition = move[1]
