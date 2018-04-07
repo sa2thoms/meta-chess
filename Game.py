@@ -10,6 +10,8 @@ from pieces.Bishop import Bishop
 
 from RuleSet import RuleSet
 from MoveRecord import MoveRecord
+from Square import Square
+from Move import Move
 
 from NoRuleException import NoRuleException
 from IllegalMoveException import IllegalMoveException
@@ -94,19 +96,23 @@ class Game:
             col = ord(spaceString[0]) - ord('A')
             row = ord(spaceString[1]) - ord('1')
             spaceCodes.append([col, row])
-        return spaceCodes
-    
-    def move(self, moveString):
-        spaceCodes = self._moveFromMoveString(moveString)
-        startPosition = spaceCodes[0]
-        endPosition = spaceCodes[1]
+        startSquare = Square(spaceCodes[0][0], spaceCodes[0][1])
+        endSquare = Square(spaceCodes[1][0], spaceCodes[1][1])
 
-        pieceForMove = self.getPiece(startPosition)
+        return Move(startSquare, endSquare)
+
+    
+    def move(self, moveIn):
+        move = moveIn
+        if (isinstance(move, str)):
+            move = self._moveFromMoveString(moveIn)
+
+        pieceForMove = self.getPiece(move.start)
         if (pieceForMove == None):
             raise IllegalMoveException('There is no piece at the starting location')
         elif (pieceForMove.color != self.turn):
             raise IllegalMoveException('Wrong colored piece')
-        elif (startPosition == endPosition):
+        elif (move.start == move.end):
             raise IllegalMoveException('The piece cannot move to where it already was')
         
         if (isinstance(pieceForMove, Pawn)):
@@ -126,30 +132,21 @@ class Game:
             moveArray = self._moveFromMoveString(move)
         
         pieceForMove = self.getPiece(moveArray[0])
-        if (pieceForMove.color == self.turn):
-            return self._checkMoveValidity(moveArray)
-        else:
-            self._switchTurn()
-            ret = self._checkMoveValidity(moveArray)
-            self._switchTurn()
-            return ret
+        return pieceForMove.isAttacking()
 
     def _checkMoveValidity(self, move):
-        startPosition = move[0]
-        endPosition = move[1]
-
-        pieceForMove = self.getPiece(startPosition)
+        pieceForMove = self.getPiece(move.start)
         if (pieceForMove == None):
             return False
         elif (pieceForMove.color != self.turn):
             return False
-        elif (startPosition == endPosition):
+        elif (move.start == move.end):
             return False
 
         elif (isinstance(pieceForMove, Pawn)):
-            return self._checkPawnValidity(pieceForMove, startPosition, endPosition)
+            return self._checkPawnValidity(pieceForMove, move)
         elif (isinstance(pieceForMove, King)):
-            return self._checkKingValidity(pieceForMove, startPosition, endPosition)
+            return self._checkKingValidity(pieceForMove, move)
 
     def _switchTurn(self):
         if (self.turn == self.COLOR_WHITE):
@@ -182,7 +179,7 @@ class Game:
         teamList.append(Knight(position=[6, row], color=color, movementRule=self.ruleSet.knightMovement))
         teamList.append(Rook(position=[7, row], color=color, movementRule=self.ruleSet.rookMovement))
 
-    def _checkPawnValidity(self, pieceForMove, startPosition, endPosition):
+    def _checkPawnValidity(self, pieceForMove, move):
         if (self.turn == self.COLOR_WHITE):
             if (endPosition == [startPosition[0], startPosition[1] + 1]):
                 if (self.getPiece(endPosition) != None):
