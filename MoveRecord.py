@@ -8,8 +8,7 @@ from pieces.Bishop import Bishop
 
 class MoveRecord:
 
-    def __init__(self, startPosition, endPosition, pieceInMotion, pieceTaken = None):
-        self.startPosition = startPosition
-        self.endPosition = endPosition
+    def __init__(self, move, pieceInMotion, pieceTaken = None):
+        self.move = move
         self.pieceInMotion = pieceInMotion
         self.pieceTaken = pieceTaken

@@ -7,3 +7,6 @@ class Move:
 
         self.start = startSquare
         self.end = endSquare
+
+    def __eql__(self, other):
+        return self.start == other.start and self.end == other.end
