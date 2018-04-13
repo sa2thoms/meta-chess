@@ -10,6 +10,9 @@ from pieces.Rook import Rook
 from pieces.Knight import Knight
 from pieces.Bishop import Bishop
 
+from Square import Square
+from Move import Move
+
 from NoRuleException import NoRuleException
 from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
@@ -59,14 +62,14 @@ def test_that_isValidMove_returns_true_for_a_valid_move():
     game = Game(ruleSet)
     game.load()
     assert game.isValidMove('D2 to D4') == True
-    assert game.isValidMove([[0, 1], [0, 3]]) == True
+    assert game.isValidMove(Move(Square(0, 1), Square(0, 3))) == True
 
 def test_that_isValidMove_returns_false_for_an_invalid_move():
     ruleSet = RuleSet(None, None, None, None)
     game = Game(ruleSet)
     game.load()
     assert game.isValidMove('D2 to E3') == False
-    assert game.isValidMove([[4, 0], [4, 1]]) == False
+    assert game.isValidMove(Move(Square(4, 0), Square(4, 1))) == False
 
 def test_that_isKingAttacked_returns_true_when_the_king_is_attacked():
     ruleSet = RuleSet(None, None, None, None)
@@ -95,8 +98,8 @@ def test_that_isAttacking_returns_true_when_piece_attacking():
     game.move('E2 to E4')
     game.move('D7 to D5')
     assert game.isAttacking('E4 to D5') == True
-    assert game.isAttacking([[3, 4], [4, 3]]) == True
-    assert game.isAttacking([[4, 0], [3, 1]]) == True
+    assert game.isAttacking(Move(Square(3, 4), Square(4, 3))) == True
+    assert game.isAttacking(Move(Square(4, 0), Square(3, 1))) == True
     
 
 def test_that_isAttacking_returns_false_when_piece_not_attacking():
@@ -104,5 +107,5 @@ def test_that_isAttacking_returns_false_when_piece_not_attacking():
     game = Game(ruleSet)
     game.load()
     assert game.isAttacking('E4 to D5') == False
-    assert game.isAttacking([[0, 1], [1, 2]]) == False
-    assert game.isAttacking([[4, 7], [4, 5]]) == False
+    assert game.isAttacking(Move(Square(0, 1), Square(1, 2))) == False
+    assert game.isAttacking(Move(Square(4, 7), Square(4, 5))) == False

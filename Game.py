@@ -133,7 +133,10 @@ class Game:
             moveArray = self._moveFromMoveString(move)
         
         pieceForMove = self.getPiece(moveArray.start)
-        return pieceForMove.isAttacking()
+        if (pieceForMove):
+            return pieceForMove.isAttacking(moveArray.end, self)
+        else:
+            return False
 
     def _checkMoveValidity(self, move):
         pieceForMove = self.getPiece(move.start)
@@ -320,7 +323,7 @@ class Game:
                     self.moveHistory.append(record)
             elif (move.start.rank - 1 == move.end.rank and abs(move.start.file - move.end.file) == 1):
                 if (self.getPiece(move.end) == None):
-                    if (len(moveHistory) == 0):
+                    if (len(self.moveHistory) == 0):
                         raise IllegalMoveException('A pawn cannot move diagonally except to take')
                     previousMove = self.moveHistory[-1]
                     if (move.start.rank == 3 and previousMove.move.start == Square(move.end.file, 1) and previousMove.move.end == Square(move.end.file, 3) and isinstance(previousMove.pieceInMotion, Pawn)):
@@ -343,7 +346,7 @@ class Game:
                     record = MoveRecord(move, pieceForMove, takenPiece)
                     self.moveHistory.append(record)
 
-    def _checkKingValidity(self, move, endPosition):
+    def _checkKingValidity(self, move):
         if (self.turn == self.COLOR_WHITE):
             if (abs(move.end.file - move.start.file) <= 1 and abs(move.end.rank - move.start.rank) <= 1):
                 if (self.getPiece(move.end) != None and self.getPiece(move.end).color == self.COLOR_WHITE):
@@ -361,7 +364,7 @@ class Game:
             else:
                 return False
 
-    def _kingMove(self, pieceForMove, startPosition, endPosition):
+    def _kingMove(self, pieceForMove, move):
         if (self.turn == self.COLOR_WHITE):
             if (abs(move.end.file - move.start.file) <= 1 and abs(move.end.rank - move.start.rank) <= 1):
                 if (self.getPiece(move.end) != None and self.getPiece(move.end).color == self.COLOR_WHITE):

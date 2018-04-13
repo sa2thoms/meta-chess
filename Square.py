@@ -9,6 +9,6 @@ class Square:
         self.file = file
         self.rank = rank
 
-    def __eql__(self, other):
+    def __eq__(self, other):
         return self.file == other.file and self.rank == other.rank
         
