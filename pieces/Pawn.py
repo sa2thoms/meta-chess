@@ -3,7 +3,7 @@ from pieces.Piece import Piece
 class Pawn(Piece):
 
     def __init__(self, position, color, symbol='pa'):
-        Piece.__init__(self, position, color, symbol)
+        Piece.__init__(self, position, color, symbol, None)
 
     def isAttacking(self, square, game):
         if self.color == game.COLOR_WHITE:

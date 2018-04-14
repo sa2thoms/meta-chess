@@ -138,6 +138,29 @@ class Game:
         else:
             return False
 
+    def _getKing(self, color):
+        if (color == self.COLOR_WHITE):
+            for piece in self.whitePieces:
+                if isinstance(piece, King):
+                    return piece
+        elif (color == self.COLOR_BLACK):
+            for piece in self.blackPieces:
+                if isinstance(piece, King):
+                    return piece
+
+    def isKingAttacked(self, color):
+        king = self._getKing(color)
+        if (color == self.COLOR_WHITE):
+            for piece in self.blackPieces:
+                if self.isAttacking(Move(piece.position, king.position)):
+                    return True
+            return False
+        if (color == self.COLOR_BLACK):
+            for piece in self.whitePieces:
+                if self.isAttacking(Move(piece.position, king.position)):
+                    return True
+            return False
+
     def _checkMoveValidity(self, move):
         pieceForMove = self.getPiece(move.start)
         if (pieceForMove == None):

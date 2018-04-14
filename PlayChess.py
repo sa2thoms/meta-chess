@@ -3,13 +3,10 @@ from RuleSet import RuleSet
 from Game import Game
 from GameRepl import GameRepl
 
+import NormalChessConfig
+
 def main():
-    knight = MovementRule(vert=False, horiz=False, diag=False, jumps=[[2, 1]])
-    bishop = MovementRule(vert=False, horiz=False, diag=True)
-    rook = MovementRule(vert=True, horiz=True, diag=False)
-    queen = MovementRule(vert=True, horiz=True, diag=True)
-    
-    rules = RuleSet(rook, knight, bishop, queen)
+    rules = NormalChessConfig.ruleSet
 
     game = Game(rules)
 
