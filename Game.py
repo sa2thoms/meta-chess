@@ -120,6 +120,18 @@ class Game:
             self._pawnMove(pieceForMove, move)
         elif (isinstance(pieceForMove, King)):
             self._kingMove(pieceForMove, move)
+        else:
+            if self.isValidMove(move):
+                takenPiece = None
+                if self.getPiece(move.end):
+                    takenPiece = self.getPiece(move.end)
+                    takenPiece.taken = True
+                pieceForMove.position = move.end
+                self._switchTurn()
+                record = MoveRecord(move, pieceForMove, takenPiece)
+                self.moveHistory.append(record)
+            else:
+                raise IllegalMoveException('The piece may not move in that way')
 
     def isValidMove(self, move):
         if (isinstance(move, str)):
@@ -162,6 +174,7 @@ class Game:
             return False
 
     def _checkMoveValidity(self, move):
+        assert isinstance(move, Move)
         pieceForMove = self.getPiece(move.start)
         if (pieceForMove == None):
             return False
@@ -174,6 +187,14 @@ class Game:
             return self._checkPawnValidity(move)
         elif (isinstance(pieceForMove, King)):
             return self._checkKingValidity(move)
+        else:
+            if pieceForMove.isAttacking(move.end, self):
+                if self.getPiece(move.end) and self.getPiece(move.end).color == pieceForMove.color:
+                    return False
+                else:
+                    return True
+            else:
+                return False
 
     def _switchTurn(self):
         if (self.turn == self.COLOR_WHITE):
