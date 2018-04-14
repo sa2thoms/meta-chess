@@ -148,9 +148,9 @@ class Game:
             return False
 
         elif (isinstance(pieceForMove, Pawn)):
-            return self._checkPawnValidity(pieceForMove, move)
+            return self._checkPawnValidity(move)
         elif (isinstance(pieceForMove, King)):
-            return self._checkKingValidity(pieceForMove, move)
+            return self._checkKingValidity(move)
 
     def _switchTurn(self):
         if (self.turn == self.COLOR_WHITE):
@@ -183,7 +183,7 @@ class Game:
         teamList.append(Knight(position = Square(6, rank), color=color, movementRule=self.ruleSet.knightMovement))
         teamList.append(Rook(position = Square(7, rank), color=color, movementRule=self.ruleSet.rookMovement))
 
-    def _checkPawnValidity(self, pieceForMove, move):
+    def _checkPawnValidity(self, move):
 
         if (self.turn == self.COLOR_WHITE):
             oneForward = Square(move.start.file, move.start.rank + 1)
