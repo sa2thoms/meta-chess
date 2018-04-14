@@ -101,7 +101,6 @@ class Game:
         endSquare = Square(spaceCodes[1][0], spaceCodes[1][1])
 
         return Move(startSquare, endSquare)
-
     
     def move(self, moveIn):
         move = moveIn
@@ -115,23 +114,22 @@ class Game:
             raise IllegalMoveException('Wrong colored piece')
         elif (move.start == move.end):
             raise IllegalMoveException('The piece cannot move to where it already was')
-        
+        elif not self.isValidMove(move):
+            raise IllegalMoveException('That move is not allowed')
+
         if (isinstance(pieceForMove, Pawn)):
             self._pawnMove(pieceForMove, move)
         elif (isinstance(pieceForMove, King)):
             self._kingMove(pieceForMove, move)
         else:
-            if self.isValidMove(move):
-                takenPiece = None
-                if self.getPiece(move.end):
-                    takenPiece = self.getPiece(move.end)
-                    takenPiece.taken = True
-                pieceForMove.position = move.end
-                self._switchTurn()
-                record = MoveRecord(move, pieceForMove, takenPiece)
-                self.moveHistory.append(record)
-            else:
-                raise IllegalMoveException('The piece may not move in that way')
+            takenPiece = None
+            if self.getPiece(move.end):
+                takenPiece = self.getPiece(move.end)
+                takenPiece.taken = True
+            pieceForMove.position = move.end
+            self._switchTurn()
+            record = MoveRecord(move, pieceForMove, takenPiece)
+            self.moveHistory.append(record)
 
     def isValidMove(self, move):
         if (isinstance(move, str)):
@@ -164,12 +162,12 @@ class Game:
         king = self._getKing(color)
         if (color == self.COLOR_WHITE):
             for piece in self.blackPieces:
-                if self.isAttacking(Move(piece.position, king.position)):
+                if (not piece.taken) and self.isAttacking(Move(piece.position, king.position)):
                     return True
             return False
-        if (color == self.COLOR_BLACK):
+        elif (color == self.COLOR_BLACK):
             for piece in self.whitePieces:
-                if self.isAttacking(Move(piece.position, king.position)):
+                if (not piece.taken) and self.isAttacking(Move(piece.position, king.position)):
                     return True
             return False
 
@@ -183,7 +181,20 @@ class Game:
         elif (move.start == move.end):
             return False
 
-        elif (isinstance(pieceForMove, Pawn)):
+        takenPiece = self.getPiece(move.end)
+        pieceForMove.position = move.end
+        if takenPiece:
+            takenPiece.taken = True
+        if self.isKingAttacked(pieceForMove.color):
+            pieceForMove.position = move.start
+            if takenPiece:
+                takenPiece.taken = False
+            return False
+        pieceForMove.position = move.start
+        if takenPiece:
+            takenPiece.taken = False
+
+        if (isinstance(pieceForMove, Pawn)):
             return self._checkPawnValidity(move)
         elif (isinstance(pieceForMove, King)):
             return self._checkKingValidity(move)

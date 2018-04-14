@@ -6,7 +6,9 @@ class King(Piece):
         Piece.__init__(self, position, color, symbol, None)
 
     def isAttacking(self, square, game = None):
-        if abs(self.position.rank - square.rank) == 1 or abs(self.position.file - square.file) == 1:
+        if square == self.position:
+            return False
+        elif abs(self.position.rank - square.rank) <= 1 and abs(self.position.file - square.file) <= 1:
             return True
         else:
             return False

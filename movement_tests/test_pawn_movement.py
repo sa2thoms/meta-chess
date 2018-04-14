@@ -17,8 +17,10 @@ from NoRuleException import NoRuleException
 from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
 
+import NormalChessConfig
+
 def test_that_move_moves_pawn_two_forward():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')
@@ -26,7 +28,7 @@ def test_that_move_moves_pawn_two_forward():
     assert game.getPiece(Square(3, 1)) == None
 
 def test_that_move_moves_pawn_one_forward():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D3')
@@ -34,7 +36,7 @@ def test_that_move_moves_pawn_one_forward():
     assert game.getPiece(Square(3, 1)) == None
 
 def test_that_pawn_takes_diagonally():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')
@@ -45,7 +47,7 @@ def test_that_pawn_takes_diagonally():
     assert game.getPiece(Square(3, 3)) == None
 
 def test_that_blocked_pawn_does_not_move_two_spaces():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')
@@ -59,7 +61,7 @@ def test_that_blocked_pawn_does_not_move_two_spaces():
     assert game.getPiece(Square(3, 4)) == None
 
 def test_that_pawn_does_not_take_forward():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')
@@ -70,7 +72,7 @@ def test_that_pawn_does_not_take_forward():
     assert isinstance(game.getPiece(Square(3, 4)), Pawn)
     
 def test_that_pawn_does_not_move_two_forward_from_wrong_row():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')
@@ -81,7 +83,7 @@ def test_that_pawn_does_not_move_two_forward_from_wrong_row():
     assert game.getPiece(Square(3, 5)) == None
 
 def test_that_pawn_takes_en_passant():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')
@@ -94,7 +96,7 @@ def test_that_pawn_takes_en_passant():
     assert game.getPiece(Square(4, 4)) == None
 
 def test_that_black_pawn_takes_en_passant():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('D2 to D4')

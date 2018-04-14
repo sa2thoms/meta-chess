@@ -17,8 +17,10 @@ from NoRuleException import NoRuleException
 from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
 
+import NormalChessConfig
+
 def test_that_king_moves_forward():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('E2 to E4')
@@ -28,7 +30,7 @@ def test_that_king_moves_forward():
     assert game.getPiece(Square(4, 0)) == None
 
 def test_that_king_takes():
-    ruleSet = RuleSet(None, None, None, None)
+    ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
     game.load()
     game.move('E2 to E4')
@@ -37,8 +39,10 @@ def test_that_king_takes():
     game.move('D5 to E4')
     game.move('A4 to A5')
     game.move('E4 to E3')
-    game.move('A5 to A6')
+    game.move('F1 to D3')
+    game.printBoard()
     game.move('E3 to D2')
+    game.printBoard()
     game.move('E1 to D2')
     assert isinstance(game.getPiece(Square(3, 1)), King)
     assert game.getPiece(Square(4, 0)) == None
