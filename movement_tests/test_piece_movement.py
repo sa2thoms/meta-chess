@@ -65,3 +65,15 @@ def test_that_knight_does_not_move_illegally():
         game.move('B1 to D2')
     with pytest.raises(IllegalMoveException):
         game.move('B1 to B3')
+
+def test_that_knight_does_not_move_diagonally():
+    ruleSet = NormalChessConfig.ruleSet
+    game = Game(ruleSet)
+    game.load()
+    game.move('E2 to E4')
+    game.move('E7 to E5')
+    game.move('D1 to F3')
+    game.move('A7 to A5')
+    game.move('F3 to F7')
+    with pytest.raises(IllegalMoveException):
+        game.move('G8 to F7')

@@ -40,9 +40,7 @@ def test_that_king_takes():
     game.move('A4 to A5')
     game.move('E4 to E3')
     game.move('F1 to D3')
-    game.printBoard()
     game.move('E3 to D2')
-    game.printBoard()
     game.move('E1 to D2')
     assert isinstance(game.getPiece(Square(3, 1)), King)
     assert game.getPiece(Square(4, 0)) == None

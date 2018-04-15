@@ -101,6 +101,14 @@ class Game:
         endSquare = Square(spaceCodes[1][0], spaceCodes[1][1])
 
         return Move(startSquare, endSquare)
+
+    def oppositeColor(self, color):
+        if color == self.COLOR_BLACK:
+            return self.COLOR_WHITE
+        elif color == self.COLOR_WHITE:
+            return self.COLOR_BLACK
+        else:
+            raise Exception('Not a valid color')
     
     def move(self, moveIn):
         move = moveIn
@@ -130,6 +138,13 @@ class Game:
             self._switchTurn()
             record = MoveRecord(move, pieceForMove, takenPiece)
             self.moveHistory.append(record)
+        if self.isKingAttacked(self.oppositeColor(pieceForMove.color)):
+            if self.checkForMate(self.oppositeColor(pieceForMove.color)):
+                return 'mate'
+            else:
+                return 'check'
+        else:
+            return 'success'
 
     def isValidMove(self, move):
         if (isinstance(move, str)):
@@ -170,6 +185,47 @@ class Game:
                 if (not piece.taken) and self.isAttacking(Move(piece.position, king.position)):
                     return True
             return False
+
+    def checkForMate(self, color):
+        if not self.isKingAttacked(color):
+            return False
+        else:
+            #check moves the king can make
+            king = self._getKing(color)
+            fstart = king.position.file - 1
+            if fstart < 0:
+                fstart = 0
+            rstart = king.position.rank - 1
+            if rstart < 0:
+                rstart = 0
+            fend = king.position.file + 1
+            if fend > 7:
+                fend = 7
+            rend = king.position.rank + 1
+            if rend > 7:
+                rend = 7
+            for fcount in range(fstart, fend + 1):
+                for rcount in range(rstart, rend + 1):
+                    square = Square(fcount, rcount)
+                    if square != king.position:
+                        if self.isValidMove(Move(king.position, square)):
+                            return False
+            
+            #TODO: now check moves ending on the checking piece (for performance)
+
+            # now check all moves (4096 combinations)
+            for fstart in range(0, 8):
+                for rstart in range(0, 8):
+                    startSquare = Square(fstart, rstart)
+                    for fend in range(0, 8):
+                        for rend in range(0, 8):
+                            endSquare = Square(fend, rend)
+                            if startSquare != endSquare:
+                                if self.isValidMove(Move(startSquare, endSquare)):
+                                    return False
+            
+            return True
+
 
     def _checkMoveValidity(self, move):
         assert isinstance(move, Move)
@@ -412,7 +468,7 @@ class Game:
                 return False
         elif (self.turn == self.COLOR_BLACK):
             if (abs(move.end.file - move.start.file) <= 1 and abs(move.end.rank - move.start.rank) <= 1):
-                if (self.getPiece(move.end).color == self.COLOR_BLACK):
+                if (self.getPiece(move.end) != None and self.getPiece(move.end).color == self.COLOR_BLACK):
                     return False
                 else:
                     return True

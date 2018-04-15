@@ -42,7 +42,7 @@ class MovementRule:
                 if (game.getPiece(Square(f, move.start.rank))):
                     return False
             return True
-        elif abs(move.end.file - move.start.file) == abs(move.end.rank - move.start.rank):
+        elif abs(move.end.file - move.start.file) == abs(move.end.rank - move.start.rank) and self.allowsDiagonal:
             fdist = move.end.file - move.start.file
             fstep = self._signOf(fdist)
             fcount = move.start.file + fstep

@@ -12,3 +12,5 @@ class Square:
     def __eq__(self, other):
         return self.file == other.file and self.rank == other.rank
         
+    def __str__(self):
+        return  str(chr(ord('A') + self.file) + chr(ord('1') + self.rank))

@@ -15,19 +15,28 @@ class GameRepl:
         if not self.game.isLoaded():
             self.game.load()
         
-        message = 'Enter move (Eg. \'D2 to D4\'): '
+        MESSAGE = 'Enter move (Eg. \'D2 to D4\'): '
 
         self.game.printBoard()
-        print('\n' + message, end="")
+        print('\n' + MESSAGE, end="")
         while True:
             moveString = input().strip()
             if moveString[0] == '/':
                 self._executeCommands(moveString.lstrip('/'))
                 continue
             try:
-                self.game.move(moveString)
+                result = self.game.move(moveString)
+                if result == 'check':
+                    print(result + "!")
+                elif result == 'mate':
+                    winning = 'White'
+                    if (self.game.turn == self.game.COLOR_WHITE):
+                        winning = 'Black'
+                    print("Checkmate! " + winning + " has won by checkmate.")
+                    self.runPostGame()
+
             except IllegalMoveException as e:
-                print('\nThat move is not legal: ' + e.message + '. Try again: ', end="")
+                print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
                 continue
             except InvalidMoveStringException:
                 helpString = 'the requested move could not be understood. Make sure you give coordinates in the following format: A4 to B2\n\ntype \'/\' to preface any command, such as \'print\', which reprints the game\'s board\n\nPlease enter a new move: '
@@ -35,7 +44,11 @@ class GameRepl:
                 continue
             
             self.game.printBoard()
-            print(message, end="")
+            print(MESSAGE, end="")
+
+    def runPostGame(self):
+        print('Game will now exit. Thanks for playing!')
+        exit()
 
     def _executeCommands(self, command):
         if command == 'exit' or command == 'quit':

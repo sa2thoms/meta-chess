@@ -106,6 +106,24 @@ def test_that_isKingAttacked_returns_true_when_the_king_is_attacked():
     game.move('E6 to D7')
     assert game.isKingAttacked(game.COLOR_BLACK) == True
 
+def test_that_checking_returns_check_from_move():
+    ruleSet = NormalChessConfig.ruleSet
+    game = Game(ruleSet)
+    game.load()
+    game.move('D2 to D4')
+    game.move('E7 to E5')
+    game.move('D4 to E5')
+    game.move('A7 to A5')
+    game.move('E5 to E6')
+    game.move('A5 to A4')
+    assert game.move('E6 to D7') == 'check'
+
+def test_that_move_returns_success_when_not_check_or_mate():
+    ruleSet = NormalChessConfig.ruleSet
+    game = Game(ruleSet)
+    game.load()
+    assert game.move('D2 to D4') == 'success'
+
 def test_that_isKingAttacked_returns_false_when_the_king_is_not_attacked():
     ruleSet = NormalChessConfig.ruleSet
     game = Game(ruleSet)
@@ -126,3 +144,15 @@ def test_that_moving_so_that_king_attacked_is_not_allowed():
     game.move('D8 to E7')
     with pytest.raises(IllegalMoveException):
         game.move('E4 to D5')
+
+def test_that_checkmate_results_in_a_mate_return():
+    ruleSet = NormalChessConfig.ruleSet
+    game = Game(ruleSet)
+    game.load()
+    game.move('E2 to E4')
+    game.move('E7 to E5')
+    game.move('D1 to F3')
+    game.move('A7 to A5')
+    game.move('F1 to C4')
+    game.move('B7 to B5')
+    assert game.move('F3 to F7') == 'mate'
