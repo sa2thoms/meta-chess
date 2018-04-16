@@ -492,7 +492,7 @@ class Game:
                 raise IllegalMoveException('A king may only move one square in any direction')
         elif (self.turn == self.COLOR_BLACK):
             if (abs(move.end.file - move.start.file) <= 1 and abs(move.end.rank - move.start.rank) <= 1):
-                if (self.getPiece(move.end).color == self.COLOR_BLACK):
+                if (self.getPiece(move.end) != None) and (self.getPiece(move.end).color == self.COLOR_BLACK):
                     raise IllegalMoveException('You may not take your own piece')
                 else:
                     takenPiece = self.getPiece(move.end)
