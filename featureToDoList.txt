@@ -1,0 +1,6 @@
+Add castling
+Add promotion of pawns
+Add saving and loading of games
+
+Add GUI
+Add Webserver
