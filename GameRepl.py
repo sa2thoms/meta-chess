@@ -4,10 +4,31 @@ from InvalidMoveStringException import InvalidMoveStringException
 
 class GameRepl:
 
-    def __init__(self, game = None):
-        if not isinstance(game, Game):
-            raise TypeError('game must be of type Game')
-        self.game = game
+    def __init__(self, ruleSet):
+        def promoCallback():
+            return self.promotionCallback()
+        self.game = Game(ruleSet, promoCallback)
+        self.state = 'normal'
+
+    def promotionCallback(self):
+        while True:
+            i = input('Enter piece to promote to (\'Queen\', \'Rook\', \'Bishop\', \'Knight\'): ').strip()
+
+            if i[0] == '/':
+                self._executeCommands(i.lstrip('/'))
+                continue
+
+            i = i.lower()
+
+            if i == 'queen':
+                return 'q'
+            elif i == 'bishop':
+                return 'b'
+            elif i == 'knight':
+                return 'k'
+            elif i == 'rook':
+                return 'r'
+
 
     def run(self):
         if self.game == None:
@@ -27,13 +48,16 @@ class GameRepl:
             try:
                 result = self.game.move(moveString)
                 if result == 'check':
-                    print(result + "!")
+                    print("Check!")
+                    self.state = result
                 elif result == 'mate':
                     winning = 'White'
                     if (self.game.turn == self.game.COLOR_WHITE):
                         winning = 'Black'
                     print("Checkmate! " + winning + " has won by checkmate.")
                     self.runPostGame()
+                elif result == 'success':
+                    self.state = 'normal'
 
             except IllegalMoveException as e:
                 print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
@@ -44,6 +68,8 @@ class GameRepl:
                 continue
             
             self.game.printBoard()
+            if self.state == 'check':
+                print('Check!')
             print(MESSAGE, end="")
 
     def runPostGame(self):

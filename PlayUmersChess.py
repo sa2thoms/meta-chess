@@ -8,9 +8,7 @@ import UmersChessConfig
 def main():
     rules = UmersChessConfig.ruleSet
 
-    game = Game(rules)
-
-    gameRepl = GameRepl(game)
+    gameRepl = GameRepl(rules)
     gameRepl.run()
 
 if __name__ == '__main__':
