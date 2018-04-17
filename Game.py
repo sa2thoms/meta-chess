@@ -146,6 +146,18 @@ class Game:
         else:
             return 'success'
 
+    def undoLastMove(self):
+        if len(self.moveHistory) == 0:
+            return False
+        record = self.moveHistory.pop()
+        record.pieceInMotion.position = record.move.start
+        if record.pieceTaken:
+            record.pieceTaken.taken = False
+        if record.piecePromotedTo:
+            record.pieceInMotion.taken = False
+            self.whitePieces.remove(record.piecePromotedTo)
+        return True
+
     def isValidMove(self, move):
         if (isinstance(move, str)):
             return self._checkMoveValidity(self._moveFromMoveString(move))

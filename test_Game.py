@@ -179,3 +179,63 @@ def test_that_checkmate_results_in_a_mate_return():
     game.move('F1 to C4')
     game.move('B7 to B5')
     assert game.move('F3 to F7') == 'mate'
+
+def test_that_undoLastMove_undoes_a_move():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('E2 to E4')
+    game.move('E7 to E5')
+    assert game.getPiece(Square(4, 6)) == None
+    assert len(game.moveHistory) == 2
+    game.undoLastMove()
+    assert game.getPiece(Square(4, 4)) == None
+    assert isinstance(game.getPiece(Square(4, 6)), Pawn)
+    assert len(game.moveHistory) == 1
+
+def test_that_a_piece_is_untaken_during_undoLastMove():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('E2 to E4')
+    game.move('D7 to D5')
+    game.move('E4 to D5')
+    game.undoLastMove()
+    assert isinstance(game.getPiece(Square(3, 4)), Pawn)
+    assert game.getPiece(Square(3, 4)).color == game.COLOR_BLACK
+    assert isinstance(game.getPiece(Square(4, 3)), Pawn)
+
+def test_that_a_piece_is_unpromoted_if_undoLastMove_undoes_its_promotion():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('H2 to H4')
+    game.move('A7 to A5')
+    game.move('H4 to H5')
+    game.move('A5 to A4')
+    game.move('H5 to H6')
+    game.move('B7 to B5')
+    game.move('H6 to G7')
+    game.move('B5 to B4')
+    assert game.move('G7 to F8') == 'check'
+    assert isinstance(game.getPiece(Square(5, 7)), Queen)
+    game.undoLastMove()
+    assert isinstance(game.getPiece(Square(6, 6)), Pawn)
+    assert isinstance(game.getPiece(Square(5, 7)), Bishop)
+
+def test_that_undo_returns_false_when_no_moves_have_been_made_and_true_otherwise():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    assert game.undoLastMove() == False
+    game.move('E2 to E4')
+    assert game.undoLastMove() == True
+    assert game.undoLastMove() == False

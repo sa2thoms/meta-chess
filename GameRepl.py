@@ -4,30 +4,47 @@ from InvalidMoveStringException import InvalidMoveStringException
 
 class GameRepl:
 
+    COMMAND_NOT_RECOGNIZED = 'commandNotRecognized'
+    COMMAND_NOT_PERMITTED = 'commandNotPermitted'
+
     def __init__(self, ruleSet):
         def promoCallback():
             return self.promotionCallback()
         self.game = Game(ruleSet, promoCallback)
         self.state = 'normal'
+        self.promoting = False
 
     def promotionCallback(self):
+        self.promoting = True
+        ret = None
         while True:
             i = input('Enter piece to promote to (\'Queen\', \'Rook\', \'Bishop\', \'Knight\'): ').strip()
 
             if i[0] == '/':
-                self._executeCommands(i.lstrip('/'))
+                status = self._executeCommands(i.lstrip('/'))
+                if status == GameRepl.COMMAND_NOT_RECOGNIZED:
+                    print('Command not recognized: Try again, or')
+                if status == GameRepl.COMMAND_NOT_PERMITTED:
+                    print('Command not permitted at this time. Try again, or')
                 continue
 
             i = i.lower()
 
             if i == 'queen':
-                return 'q'
+                ret = 'q'
+                break
             elif i == 'bishop':
-                return 'b'
+                ret = 'b'
+                break
             elif i == 'knight':
-                return 'k'
+                ret = 'k'
+                break
             elif i == 'rook':
-                return 'r'
+                ret = 'r'
+                break
+        self.promoting = False
+        return ret
+
 
 
     def run(self):
@@ -43,7 +60,18 @@ class GameRepl:
         while True:
             moveString = input().strip()
             if moveString[0] == '/':
-                self._executeCommands(moveString.lstrip('/'))
+                status = self._executeCommands(moveString.lstrip('/'))
+                if status == GameRepl.COMMAND_NOT_RECOGNIZED:
+                    print('Command not recognized. Please try again or enter your next move: ', end="")
+                elif status == GameRepl.COMMAND_NOT_PERMITTED:
+                    print('Command not permitted at this time. Please try again or enter your next move: ', end="")
+                elif status == 'undone':
+                    self.game.printBoard()
+                    print('\n' + MESSAGE, end="")
+                elif status == 'not undone':
+                    print('\nCould not undo: No moves have been made. Enter a move or a command: ', end="")
+                else:
+                    print('\n' + MESSAGE, end="")
                 continue
             try:
                 result = self.game.move(moveString)
@@ -79,5 +107,15 @@ class GameRepl:
     def _executeCommands(self, command):
         if command == 'exit' or command == 'quit':
             exit()
+        elif command == 'undo':
+            if not self.promoting:
+                resp = self.game.undoLastMove()
+                if resp:
+                    return 'undone'
+                else:
+                    return 'not undone'
+            else:
+                return GameRepl.COMMAND_NOT_PERMITTED
         else:
-            print('Command not recognized. Please try again or enter your next move: ', end="")
+            return GameRepl.COMMAND_NOT_RECOGNIZED
+            
