@@ -8,9 +8,7 @@ import NormalChessConfig
 def main():
     rules = NormalChessConfig.ruleSet
 
-    game = Game(rules)
-
-    gameRepl = GameRepl(game)
+    gameRepl = GameRepl(rules)
     gameRepl.run()
 
 if __name__ == '__main__':

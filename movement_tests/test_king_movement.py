@@ -21,7 +21,9 @@ import NormalChessConfig
 
 def test_that_king_moves_forward():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     game.move('E2 to E4')
     game.move('D7 to D5')
@@ -31,7 +33,9 @@ def test_that_king_moves_forward():
 
 def test_that_king_takes():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     game.move('E2 to E4')
     game.move('D7 to D5')

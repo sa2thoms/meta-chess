@@ -21,7 +21,9 @@ import NormalChessConfig
 
 def test_that_queen_moves_correctly():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     game.move(Move(Square(4, 1), Square(4, 3)))
     game.move('E7 to E5')
@@ -36,7 +38,9 @@ def test_that_queen_moves_correctly():
 
 def test_that_queen_does_not_move_illegally():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     game.move(Move(Square(4, 1), Square(4, 3)))
     game.move('E7 to E5')
@@ -51,7 +55,9 @@ def test_that_queen_does_not_move_illegally():
 
 def test_that_knight_moves_correctly():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+         return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     game.move('E2 to E4')
     game.move('B8 to C6')
@@ -59,7 +65,9 @@ def test_that_knight_moves_correctly():
 
 def test_that_knight_does_not_move_illegally():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     with pytest.raises(IllegalMoveException):
         game.move('B1 to D2')
@@ -68,7 +76,9 @@ def test_that_knight_does_not_move_illegally():
 
 def test_that_knight_does_not_move_diagonally():
     ruleSet = NormalChessConfig.ruleSet
-    game = Game(ruleSet)
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
     game.load()
     game.move('E2 to E4')
     game.move('E7 to E5')
@@ -77,3 +87,15 @@ def test_that_knight_does_not_move_diagonally():
     game.move('F3 to F7')
     with pytest.raises(IllegalMoveException):
         game.move('G8 to F7')
+
+def test_that_multiple_jump_moves_work():
+    ruleSet = NormalChessConfig.ruleSet
+    ruleSet.knightMovement.jumpRules.append([3, 3])
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('B1 to C3')
+    game.move('B8 to C6')
+    game.move('A2 to A4')
+    assert game.move('C6 to B4') == 'mate'
