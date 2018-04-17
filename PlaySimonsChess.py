@@ -8,9 +8,7 @@ import SimonsChessConfig
 def main():
     rules = SimonsChessConfig.ruleSet
 
-    game = Game(rules)
-
-    gameRepl = GameRepl(game)
+    gameRepl = GameRepl(rules)
     gameRepl.run()
 
 if __name__ == '__main__':
