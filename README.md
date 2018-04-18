@@ -8,4 +8,9 @@ Installation requirements:
   1. Run `pip install pytest`
 3. Install Django version 2.0.4
   1. Run `pip install Django==2.0.4`
-
+  2. You can verify Django was installed correctly by openning the Python live interpreter by running `python` and the entering
+    ```
+    >>> import django
+    >>> print(django.get_version())
+    2.0
+    ```
