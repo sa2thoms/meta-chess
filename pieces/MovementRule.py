@@ -81,7 +81,7 @@ class MovementRule:
         if self.allowsDiagonal:
             total += 3.0 + (total / 5.0)
 
-        for jumpRule in jumpRules:
+        for jumpRule in self.jumpRules:
             if jumpRule[0] == 0 or jumpRule[1] == 0:
                 total += 1.0 + (total / 10.0)
             elif jumpRule[0] == jumpRule[1]:

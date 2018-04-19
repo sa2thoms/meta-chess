@@ -2,19 +2,22 @@ from Game import Game
 from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
 
+from Ai import Ai
+
 class AiRepl:
 
     COMMAND_NOT_RECOGNIZED = 'commandNotRecognized'
     COMMAND_NOT_PERMITTED = 'commandNotPermitted'
 
-    def __init__(self, ruleSet, ai, aiColor):
+    def __init__(self, ruleSet, aiDepth, aiColor):
         def promoCallback():
             if self.game.turn == self.aiColor:
                 return self.aiPromotionCallback()
             else:
                 return self.humanPromotionCallback()
         self.game = Game(ruleSet, promoCallback)
-        self.ai = ai
+        self.ai = Ai(aiDepth)
+        self.ai.setPromotionPiece(self.game)
         self.aiColor = aiColor
         self.state = 'normal'
         self.promoting = False
