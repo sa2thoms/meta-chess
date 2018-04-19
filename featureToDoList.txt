@@ -3,3 +3,5 @@ Add saving and loading of games
 
 Add GUI
 Add Webserver
+
+Add AI control

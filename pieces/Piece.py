@@ -18,3 +18,12 @@ class Piece:
             return False
         else:
             return self.movementRule.isAttacking(Move(self.position, square), game)
+
+    def allAttackingMoves(self, game):
+        if self.taken:
+            return []
+        else:
+            return self.movementRule.allAttackingMoves(self.position, game)
+
+    def pointValue(self):
+        return self.movementRule.pointValue(self.position)

@@ -29,6 +29,9 @@ class bcolors:
 
 class Game:
 
+    COLOR_WHITE = 0
+    COLOR_BLACK = 1
+
     def __init__(self, ruleSet, promotionCallback):
         self.ruleSet = ruleSet
         self.promotionCallback = promotionCallback
@@ -36,9 +39,7 @@ class Game:
         self.whitePieces = []
         self.blackPieces = []
 
-        self.COLOR_WHITE = 0
-        self.COLOR_BLACK = 1
-        self.turn = self.COLOR_WHITE
+        self.turn = Game.COLOR_WHITE
 
         self.moveHistory = []
 
@@ -288,6 +289,30 @@ class Game:
             if piece.position == position and piece.taken == False:
                 return piece
         return None
+
+    def positionDifferential(self):
+        whiteTotal = 0.0
+        blackTotal = 0.0
+
+        for piece in self.whitePieces:
+            whiteTotal += piece.pointValue()
+        for piece in self.blackPieces:
+            blackTotal += piece.pointValue
+
+        if self.turn == Game.COLOR_WHITE:
+            return whiteTotal - blackTotal
+        elif self.turn == Game.COLOR_BLACK:
+            return blackTotal - whiteTotal
+
+    def allLegalMoves(self):
+        if self.turn == Game.COLOR_WHITE:
+            attackingMoves = reduce((lambda acc, fromPiece: acc + fromPiece.allAttackingMoves(self)), self.whitePieces)
+            validMoves = filter((lambda move: self.isValidMove(move)), attackingMoves)
+            return validMoves
+        elif self.turn == Game.COLOR_BLACK:
+            attackingMoves = reduce((lambda acc, fromPiece: acc + fromPiece.allAttackingMoves(self)), self.blackPieces)
+            validMoves = filter((lambda move: self.isValidMove(move)), attackingMoves)
+            return validMoves
 
     def _loadPowerPieces(self, color):
         rank = color * 7
