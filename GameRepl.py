@@ -19,7 +19,8 @@ class GameRepl:
         ret = None
         while True:
             i = input('Enter piece to promote to (\'Queen\', \'Rook\', \'Bishop\', \'Knight\'): ').strip()
-
+            if not len(i):
+                continue
             if i[0] == '/':
                 status = self._executeCommands(i.lstrip('/'))
                 if status == GameRepl.COMMAND_NOT_RECOGNIZED:
@@ -59,6 +60,8 @@ class GameRepl:
         print('\n' + MESSAGE, end="")
         while True:
             moveString = input().strip()
+            if not len(moveString):
+                continue
             if moveString[0] == '/':
                 status = self._executeCommands(moveString.lstrip('/'))
                 if status == GameRepl.COMMAND_NOT_RECOGNIZED:

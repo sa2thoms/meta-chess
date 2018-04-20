@@ -33,7 +33,8 @@ class AiRepl:
         ret = None
         while True:
             i = input('Enter piece to promote to (\'Queen\', \'Rook\', \'Bishop\', \'Knight\'): ').strip()
-
+            if not len(i):
+                continue
             if i[0] == '/':
                 status = self._executeCommands(i.lstrip('/'))
                 if status == AiRepl.COMMAND_NOT_RECOGNIZED:
@@ -85,6 +86,8 @@ class AiRepl:
                     self.state = 'normal'
             else:
                 moveString = input().strip()
+                if not len(moveString):
+                    continue
                 if moveString[0] == '/':
                     status = self._executeCommands(moveString.lstrip('/'))
                     if status == AiRepl.COMMAND_NOT_RECOGNIZED:
