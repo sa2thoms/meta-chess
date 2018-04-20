@@ -65,9 +65,10 @@ class MovementRule:
         for f in range(0, 8):
             for r in range(0, 8):
                 endSquare = Square(f, r)
-                move = Move(square, endSquare)
-                if self.isAttacking(move, game):
-                    allMoves.append(move)
+                if startSquare != endSquare:
+                    move = Move(startSquare, endSquare)
+                    if self.isAttacking(move, game):
+                        allMoves.append(move)
         return allMoves
 
     def pointValue(self, square):

@@ -11,7 +11,7 @@ class AiRepl:
 
     def __init__(self, ruleSet, aiDepth, aiColor):
         def promoCallback():
-            if self.game.turn == self.aiColor:
+            if self.realTurn == self.aiColor:
                 return self.aiPromotionCallback()
             else:
                 return self.humanPromotionCallback()
@@ -23,6 +23,7 @@ class AiRepl:
         self.promoting = False
 
         self.ai.setPromotionPiece(self.game)
+        self.realTurn = Game.COLOR_WHITE
 
     def aiPromotionCallback(self):
         return self.ai.promotionCallback()
@@ -124,6 +125,11 @@ class AiRepl:
             if self.state == 'check':
                 print('Check!')
             print(MESSAGE, end="")
+
+            if self.realTurn == 1:
+                self.realTurn = 0
+            else:
+                self.realTurn = 1
 
     def runPostGame(self):
         print('Game will now exit. Thanks for playing!')

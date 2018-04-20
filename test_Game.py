@@ -239,3 +239,12 @@ def test_that_undo_returns_false_when_no_moves_have_been_made_and_true_otherwise
     game.move('E2 to E4')
     assert game.undoLastMove() == True
     assert game.undoLastMove() == False
+
+def test_that_positionDifferential_returns_zero_at_start():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    assert game.positionDifferential() == 0.0
+    

@@ -1,4 +1,5 @@
 import re
+from functools import reduce
 
 from pieces.Piece import Piece
 from pieces.Pawn import Pawn
@@ -157,6 +158,7 @@ class Game:
         if record.piecePromotedTo:
             record.pieceInMotion.taken = False
             self.whitePieces.remove(record.piecePromotedTo)
+        self._switchTurn()
         return True
 
     def isValidMove(self, move):
@@ -295,22 +297,24 @@ class Game:
         blackTotal = 0.0
 
         for piece in self.whitePieces:
-            whiteTotal += piece.pointValue()
+            if not piece.taken:
+                whiteTotal += piece.pointValue()
         for piece in self.blackPieces:
-            blackTotal += piece.pointValue
+            if not piece.taken:
+                blackTotal += piece.pointValue()
 
-        if self.turn == Game.COLOR_WHITE:
-            return whiteTotal - blackTotal
-        elif self.turn == Game.COLOR_BLACK:
-            return blackTotal - whiteTotal
+        return whiteTotal - blackTotal
 
     def allLegalMoves(self):
+        def addAttacksToList(listOfMoves, piece):
+            return listOfMoves + list(piece.allAttackingMoves(self))
+        
         if self.turn == Game.COLOR_WHITE:
-            attackingMoves = reduce((lambda acc, fromPiece: acc + fromPiece.allAttackingMoves(self)), self.whitePieces)
+            attackingMoves = reduce(addAttacksToList, self.whitePieces, [])
             validMoves = filter((lambda move: self.isValidMove(move)), attackingMoves)
             return validMoves
         elif self.turn == Game.COLOR_BLACK:
-            attackingMoves = reduce((lambda acc, fromPiece: acc + fromPiece.allAttackingMoves(self)), self.blackPieces)
+            attackingMoves = reduce(addAttacksToList, self.blackPieces, [])
             validMoves = filter((lambda move: self.isValidMove(move)), attackingMoves)
             return validMoves
 

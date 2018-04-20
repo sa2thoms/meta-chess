@@ -1,5 +1,8 @@
 from pieces.Piece import Piece
 
+from Square import Square
+from Move import Move
+
 class King(Piece):
 
     def __init__(self, position, color, symbol='Ki'):

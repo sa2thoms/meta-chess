@@ -1,5 +1,8 @@
 from pieces.Piece import Piece
 
+from Square import Square
+from Move import Move
+
 class Pawn(Piece):
 
     def __init__(self, position, color, symbol='pa'):
@@ -44,7 +47,7 @@ class Pawn(Piece):
     def allAttackingMoves(self, game):
         if self.taken:
             return []
-        elif self.color == Game.COLOR_WHITE:
+        elif self.color == game.COLOR_WHITE:
             moves = []
             startFile = max([0, self.position.file - 1])
             endFile = min([7, self.position.file + 1])
@@ -54,19 +57,19 @@ class Pawn(Piece):
                 if self.position.rank == 1:
                     moves.append(Move(self.position, Square(self.position.file, self.position.rank + 2)))
             return filter((lambda m: self.isAttacking(m.end, game)), moves)
-        elif self.color == Game.COLOR_BLACK:
+        elif self.color == game.COLOR_BLACK:
             moves = []
             startFile = max([0, self.position.file - 1])
             endFile = min([7, self.position.file + 1])
             if self.position.rank > 0:
-                for f in range(startFile, endFile - 1):
+                for f in range(startFile, endFile + 1):
                     moves.append(Move(self.position, Square(f, self.position.rank - 1)))
                 if self.position.rank == 6:
                     moves.append(Move(self.position, Square(self.position.file, self.position.rank - 2)))
             return filter((lambda m: self.isAttacking(m.end, game)), moves)
 
     def pointValue(self):
-        if self.color == Game.COLOR_WHITE:
+        if self.color == 0:
             return 0.8 + 0.2 * self.position.rank
         else:
             return 0.8 + 0.2 * (7 - self.position.rank)
