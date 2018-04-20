@@ -46,7 +46,7 @@ class Ai:
         if len(moves):
             bestScore = Ai.BestCaseMove(moves[0], 100000000.0)
             for move in moves:
-                game.move(move)
+                game.move(move, knownValid=True)
                 score = self._worstDifferential(bestScore.differential, depth, game).differential
                 if score < bestScore.differential:
                     bestScore.move = move
@@ -60,7 +60,7 @@ class Ai:
             if len(moves):
                 worstScore = Ai.BestCaseMove(moves[0], -100000000000.0)
                 for move in moves:
-                    game.move(move)
+                    game.move(move, knownValid=True)
                     score = game.positionDifferential()
                     if score > worstScore.differential:
                         worstScore.move = move
@@ -74,7 +74,7 @@ class Ai:
             if len(moves):
                 worstScore = Ai.BestCaseMove(moves[0], -1000000000000.0)
                 for move in moves:
-                    game.move(move)
+                    game.move(move, knownValid=True)
                     score = self._getBestMoveAtDepth(depth - 1, game).differential
                     if score > worstScore.differential:
                         worstScore.move = move

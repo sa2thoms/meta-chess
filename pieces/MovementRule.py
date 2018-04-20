@@ -9,6 +9,8 @@ class MovementRule:
         self.allowsDiagonal = diag
         self.jumpRules = jumps
 
+        self._pointValue = self._calculatePointValue()
+
     def _moveConformsToJumpRules(self, move):
         for jumpRule in self.jumpRules:
             if (jumpRule[0] == abs(move.end.file - move.start.file) and jumpRule[1] == abs(move.end.rank - move.start.rank)):
@@ -71,7 +73,7 @@ class MovementRule:
                         allMoves.append(move)
         return allMoves
 
-    def pointValue(self, square):
+    def _calculatePointValue(self):
         total = 0.0
 
         if self.allowsVerticalCartesian or self.allowsHorizontalCartesian:
@@ -91,8 +93,12 @@ class MovementRule:
                 total += 3.0 + (total / 5.0)
             else:
                 total += 1.5 + (total / 10.0)
+        
+        return total
 
+    def pointValue(self, square):
+        total = self._pointValue
         if abs(3.5 - square.file) < 2.0 and abs(3.5 - square.rank) < 2.0:
-            total += 0.5 + (total / 20.0)
+            total += 0.3 + (total * 0.05)
         
         return total

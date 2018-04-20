@@ -113,20 +113,21 @@ class Game:
         else:
             raise Exception('Not a valid color')
     
-    def move(self, moveIn):
+    def move(self, moveIn, knownValid = False):
         move = moveIn
         if (isinstance(move, str)):
             move = self._moveFromMoveString(moveIn)
 
         pieceForMove = self.getPiece(move.start)
-        if (pieceForMove == None):
-            raise IllegalMoveException('There is no piece at the starting location')
-        elif (pieceForMove.color != self.turn):
-            raise IllegalMoveException('Wrong colored piece')
-        elif (move.start == move.end):
-            raise IllegalMoveException('The piece cannot move to where it already was')
-        elif not self.isValidMove(move):
-            raise IllegalMoveException('That move is not allowed')
+        if not knownValid:
+            if (pieceForMove == None):
+                raise IllegalMoveException('There is no piece at the starting location')
+            elif (pieceForMove.color != self.turn):
+                raise IllegalMoveException('Wrong colored piece')
+            elif (move.start == move.end):
+                raise IllegalMoveException('The piece cannot move to where it already was')
+            elif not self.isValidMove(move):
+                raise IllegalMoveException('That move is not allowed')
 
         if (isinstance(pieceForMove, Pawn)):
             self._pawnMove(pieceForMove, move)
