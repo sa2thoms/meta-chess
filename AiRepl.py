@@ -4,6 +4,8 @@ from InvalidMoveStringException import InvalidMoveStringException
 
 from Ai import Ai
 
+from color import WHITE, BLACK
+
 class AiRepl:
 
     COMMAND_NOT_RECOGNIZED = 'commandNotRecognized'
