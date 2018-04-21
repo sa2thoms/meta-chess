@@ -2,6 +2,8 @@ import pytest
 from RuleSet import RuleSet
 from Game import Game
 
+from color import WHITE, BLACK
+
 from pieces.Piece import Piece
 from pieces.Pawn import Pawn
 from pieces.King import King
@@ -114,10 +116,10 @@ def test_that_isKingAttacked_returns_true_when_the_king_is_attacked():
     game.move('D4 to E5')
     game.move('A7 to A5')
     game.move('E5 to E6')
-    assert game.isKingAttacked(game.COLOR_BLACK) == False
+    assert game.isKingAttacked(BLACK) == False
     game.move('A5 to A4')
     game.move('E6 to D7')
-    assert game.isKingAttacked(game.COLOR_BLACK) == True
+    assert game.isKingAttacked(BLACK) == True
 
 def test_that_checking_returns_check_from_move():
     ruleSet = NormalChessConfig.ruleSet
@@ -147,7 +149,7 @@ def test_that_isKingAttacked_returns_false_when_the_king_is_not_attacked():
         return 'q'
     game = Game(ruleSet, promotionCallback)
     game.load()
-    assert game.isKingAttacked(game.COLOR_WHITE) == False
+    assert game.isKingAttacked(WHITE) == False
 
 def test_that_moving_so_that_king_attacked_is_not_allowed():
     ruleSet = NormalChessConfig.ruleSet
@@ -206,7 +208,7 @@ def test_that_a_piece_is_untaken_during_undoLastMove():
     game.move('E4 to D5')
     game.undoLastMove()
     assert isinstance(game.getPiece(Square(3, 4)), Pawn)
-    assert game.getPiece(Square(3, 4)).color == game.COLOR_BLACK
+    assert game.getPiece(Square(3, 4)).color == BLACK
     assert isinstance(game.getPiece(Square(4, 3)), Pawn)
 
 def test_that_a_piece_is_unpromoted_if_undoLastMove_undoes_its_promotion():

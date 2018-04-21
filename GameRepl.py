@@ -2,6 +2,8 @@ from Game import Game
 from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
 
+from color import WHITE, BLACK
+
 class GameRepl:
 
     COMMAND_NOT_RECOGNIZED = 'commandNotRecognized'
@@ -83,7 +85,7 @@ class GameRepl:
                     self.state = result
                 elif result == 'mate':
                     winning = 'White'
-                    if (self.game.turn == self.game.COLOR_WHITE):
+                    if (self.game.turn == self.WHITE):
                         winning = 'Black'
                     print("Checkmate! " + winning + " has won by checkmate.")
                     self.runPostGame()

@@ -2,6 +2,8 @@ import pytest
 from RuleSet import RuleSet
 from Game import Game
 
+from color import WHITE, BLACK
+
 from pieces.Piece import Piece
 from pieces.Pawn import Pawn
 from pieces.King import King

@@ -2,6 +2,8 @@ import pytest
 from RuleSet import RuleSet
 from Game import Game
 
+from color import WHITE, BLACK
+
 from pieces.Piece import Piece
 from pieces.Pawn import Pawn
 from pieces.King import King
@@ -49,7 +51,7 @@ def test_that_pawn_takes_diagonally():
     game.move('E7 to E5')
     game.move('D4 to E5')
     assert isinstance(game.getPiece(Square(4, 4)), Pawn)
-    assert game.getPiece(Square(4, 4)).color == game.COLOR_WHITE
+    assert game.getPiece(Square(4, 4)).color == WHITE
     assert game.getPiece(Square(3, 3)) == None
 
 def test_that_blocked_pawn_does_not_move_two_spaces():
@@ -106,7 +108,7 @@ def test_that_pawn_takes_en_passant():
     game.move('E7 to E5')
     game.move('D5 to E6')
     assert isinstance(game.getPiece(Square(4, 5)), Pawn)
-    assert game.getPiece(Square(4, 5)).color == game.COLOR_WHITE
+    assert game.getPiece(Square(4, 5)).color == WHITE
     assert game.getPiece(Square(4, 4)) == None
 
 def test_that_black_pawn_takes_en_passant():
@@ -122,7 +124,7 @@ def test_that_black_pawn_takes_en_passant():
     game.move('B2 to B4')
     game.move('A4 to B3')
     assert isinstance(game.getPiece(Square(1, 2)), Pawn)
-    assert game.getPiece(Square(1, 2)).color == game.COLOR_BLACK
+    assert game.getPiece(Square(1, 2)).color == BLACK
     assert game.getPiece(Square(1, 3)) == None
 
 def test_that_pawn_promotes_to_queen():

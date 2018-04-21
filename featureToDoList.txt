@@ -1,9 +1,9 @@
 Add castling
 Add saving and loading of games
-
-Add GUI
+    Implement AI portion in C++
 Add Webserver
-
-Add AI control
+    Add GUI
 
 Refactor Colors out of game
+
+Implement Entire Game in C++

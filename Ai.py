@@ -1,13 +1,18 @@
 from Game import Game
 
+from color import WHITE, BLACK
+
 from Square import Square
 from Move import Move
+
+import random
 
 class Ai:
 
     def __init__(self, searchDepth):
         self.searchDepth = searchDepth
         self.promoteTo = 'q'
+        random.seed()
 
     def setPromotionPiece(self, game):
         bestScore = 0.0
@@ -29,7 +34,7 @@ class Ai:
 
     def bestMove(self, game):
         bestScoreEver = 10000000000.0
-        if game.turn == Game.COLOR_BLACK:
+        if game.turn == BLACK:
             bestScoreEver = -10000000000.0
         return self._getBestMoveAtDepth(bestScoreEver, self.searchDepth, game).move
 
@@ -44,12 +49,15 @@ class Ai:
         def __gt__(self, other):
             return self.differential > other.differential
 
+    def _coinToss(self):
+        return bool(random.getrandbits(1))
+
     def _getBestMoveAtDepth(self, bestScoreSoFar, depth, game):
         worstScoreEver = 10000000000.0
-        if game.turn == Game.COLOR_WHITE:
+        if game.turn == WHITE:
             worstScoreEver = -10000000000.0
         isBetterThan = lambda a, b: a < b
-        if game.turn == Game.COLOR_WHITE:
+        if game.turn == WHITE:
             isBetterThan = lambda a, b: a > b
 
         if depth <= 1:
@@ -60,6 +68,9 @@ class Ai:
                     game.move(move, knownValid=True)
                     score = game.positionDifferential()
                     if isBetterThan(score, bestScore.differential):
+                        bestScore.move = move
+                        bestScore.differential = score
+                    elif score == bestScore.differential and self._coinToss():
                         bestScore.move = move
                         bestScore.differential = score
                     game.undoLastMove()
@@ -74,6 +85,9 @@ class Ai:
                     game.move(move, knownValid=True)
                     score = self._getBestMoveAtDepth(bestScore.differential, depth - 1, game).differential
                     if isBetterThan(score, bestScore.differential):
+                        bestScore.move = move
+                        bestScore.differential = score
+                    elif score == bestScore.differential and self._coinToss():
                         bestScore.move = move
                         bestScore.differential = score
                     game.undoLastMove()

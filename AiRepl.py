@@ -23,7 +23,7 @@ class AiRepl:
         self.promoting = False
 
         self.ai.setPromotionPiece(self.game)
-        self.realTurn = Game.COLOR_WHITE
+        self.realTurn = WHITE
 
     def aiPromotionCallback(self):
         return self.ai.promotionCallback()
@@ -78,7 +78,7 @@ class AiRepl:
                     self.state = result
                 elif result == 'mate':
                     winning = 'White'
-                    if (self.game.turn == self.game.COLOR_WHITE):
+                    if (self.game.turn == self.WHITE):
                         winning = 'Black'
                     self.game.printBoard()
                     print("Checkmate! " + winning + " has won by checkmate.")
@@ -110,7 +110,7 @@ class AiRepl:
                         self.state = result
                     elif result == 'mate':
                         winning = 'White'
-                        if (self.game.turn == self.game.COLOR_WHITE):
+                        if (self.game.turn == self.WHITE):
                             winning = 'Black'
                         self.game.printBoard()
                         print("Checkmate! " + winning + " has won by checkmate.")
