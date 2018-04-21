@@ -8,7 +8,7 @@ import NormalChessConfig
 def main():
     rules = NormalChessConfig.ruleSet
 
-    searchDepth = 2
+    searchDepth = 4
     aiRepl = AiRepl(rules, searchDepth, Game.COLOR_BLACK)
     aiRepl.run()
 

@@ -28,7 +28,10 @@ class Ai:
         return self.promoteTo
 
     def bestMove(self, game):
-        return self._getBestMoveAtDepth(self.searchDepth, game).move
+        bestScoreEver = 10000000000.0
+        if game.turn == Game.COLOR_BLACK:
+            bestScoreEver = -10000000000.0
+        return self._getBestMoveAtDepth(bestScoreEver, self.searchDepth, game).move
 
     class BestCaseMove:
         def __init__(self, move, differential):
@@ -41,45 +44,39 @@ class Ai:
         def __gt__(self, other):
             return self.differential > other.differential
 
-    def _getBestMoveAtDepth(self, depth, game):
-        moves = list(game.allLegalMoves())
-        if len(moves):
-            bestScore = Ai.BestCaseMove(moves[0], 100000000.0)
-            for move in moves:
-                game.move(move, knownValid=True)
-                score = self._worstDifferential(bestScore.differential, depth, game).differential
-                if score < bestScore.differential:
-                    bestScore.move = move
-                    bestScore.differential = score
-                game.undoLastMove()
-            return bestScore
+    def _getBestMoveAtDepth(self, bestScoreSoFar, depth, game):
+        worstScoreEver = 10000000000.0
+        if game.turn == Game.COLOR_WHITE:
+            worstScoreEver = -10000000000.0
+        isBetterThan = lambda a, b: a < b
+        if game.turn == Game.COLOR_WHITE:
+            isBetterThan = lambda a, b: a > b
 
-    def _worstDifferential(self, bestScoreSoFar, depth, game):
-        if depth == 1:
+        if depth <= 1:
             moves = list(game.allLegalMoves())
             if len(moves):
-                worstScore = Ai.BestCaseMove(moves[0], -100000000000.0)
+                bestScore = Ai.BestCaseMove(moves[0], worstScoreEver)
                 for move in moves:
                     game.move(move, knownValid=True)
                     score = game.positionDifferential()
-                    if score > worstScore.differential:
-                        worstScore.move = move
-                        worstScore.differential = score
+                    if isBetterThan(score, bestScore.differential):
+                        bestScore.move = move
+                        bestScore.differential = score
                     game.undoLastMove()
-                    if score > bestScoreSoFar:
+                    if isBetterThan(score, bestScoreSoFar):
                         break
-                return worstScore
+                return bestScore
         else:
             moves = list(game.allLegalMoves())
             if len(moves):
-                worstScore = Ai.BestCaseMove(moves[0], -1000000000000.0)
+                bestScore = Ai.BestCaseMove(moves[0], worstScoreEver)
                 for move in moves:
                     game.move(move, knownValid=True)
-                    score = self._getBestMoveAtDepth(depth - 1, game).differential
-                    if score > worstScore.differential:
-                        worstScore.move = move
-                        worstScore.differential = score
+                    score = self._getBestMoveAtDepth(bestScore.differential, depth - 1, game).differential
+                    if isBetterThan(score, bestScore.differential):
+                        bestScore.move = move
+                        bestScore.differential = score
                     game.undoLastMove()
-                    if score > bestScoreSoFar:
+                    if isBetterThan(score, bestScoreSoFar):
                         break
-                return worstScore
+                return bestScore

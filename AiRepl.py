@@ -80,6 +80,7 @@ class AiRepl:
                     winning = 'White'
                     if (self.game.turn == self.game.COLOR_WHITE):
                         winning = 'Black'
+                    self.game.printBoard()
                     print("Checkmate! " + winning + " has won by checkmate.")
                     self.runPostGame()
                 elif result == 'success':
@@ -111,6 +112,7 @@ class AiRepl:
                         winning = 'White'
                         if (self.game.turn == self.game.COLOR_WHITE):
                             winning = 'Black'
+                        self.game.printBoard()
                         print("Checkmate! " + winning + " has won by checkmate.")
                         self.runPostGame()
                     elif result == 'success':

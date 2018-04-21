@@ -33,5 +33,19 @@ def test_that_ai_makes_correct_choice_for_one_move_depth():
     game.move('D8 to F6')
     game.move('F3 to F5')
 
-    ai = Ai(1)
+    ai = Ai(2)
     assert ai.bestMove(game) == Move(Square(5, 5), Square(5, 4))
+
+def test_that_ai_makes_good_move_playing_as_white():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('E2 to E4')
+    game.move('E7 to E5')
+    game.move('G1 to F3')
+    game.move('D8 to H4')
+
+    ai = Ai(2)
+    assert ai.bestMove(game) == Move(Square(5, 2), Square(7, 3))

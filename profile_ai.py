@@ -31,7 +31,7 @@ if __name__ == '__main__':
     game.load()
     game.move('E2 to E4')
 
-    ai = Ai(2)
+    ai = Ai(4)
 
     cProfile.run('ai.bestMove(game)')
     
