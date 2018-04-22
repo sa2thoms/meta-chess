@@ -51,3 +51,16 @@ def test_that_ai_makes_good_move_playing_as_white():
 
     ai = Ai(2)
     assert ai.bestMove(game) == Move(Square(5, 2), Square(7, 3))
+
+def test_that_ai_does_checkmate():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('F2 to F3')
+    game.move('E7 to E5')
+    game.move('G2 to G4')
+    
+    ai = Ai(3)
+    assert ai.bestMove(game) == Move(Square(3, 7), Square(7, 3))
