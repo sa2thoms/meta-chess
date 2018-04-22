@@ -13,6 +13,8 @@ class King(Piece):
             return False
         elif abs(self.position.rank - square.rank) <= 1 and abs(self.position.file - square.file) <= 1:
             return True
+        elif self.position == Square(7 * self.color, 4) and square.rank == self.position.rank and abs(square.file - self.position.file) == 2:
+            return True
         else:
             return False
 
@@ -29,6 +31,10 @@ class King(Piece):
                 square = Square(f, r)
                 if square != self.position:
                     moves.append(Move(self.position, square))
+
+        if self.position == Square(7 * self.color, 4):
+            moves.append(Move(self.position, Square(self.position.file - 2, self.position.rank)))
+            moves.append(Move(self.position, Square(self.position.file + 2, self.position.rank)))
         
         return moves
 

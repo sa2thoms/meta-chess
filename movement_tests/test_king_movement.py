@@ -132,3 +132,48 @@ def test_that_queenside_castling_works_for_black():
     assert isinstance(game.getPiece(Square(2, 7)), King)
     assert game.getPiece(Square(1, 7)) == None
     assert game.getPiece(Square(0, 7)) == None
+
+def test_that_undo_of_a_castle_works():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('E2 to E4')
+    game.move('E7 to E5')
+    game.move('D2 to D4')
+    game.move('D7 to D5')
+    game.move('D1 to E2')
+    game.move('D8 to E7')
+    game.move('C1 to D2')
+    game.move('C8 to D7')
+    game.move('B1 to C3')
+    game.move('B8 to C6')
+    game.move('E1 to C1')
+    assert game.move('E8 to C8') == 'success'
+    game.undoLastMove()
+    assert isinstance(game.getPiece(Square(0, 7)), Rook)
+    assert isinstance(game.getPiece(Square(4, 7)), King)
+    assert game.getPiece(Square(1, 7)) == None
+    assert game.getPiece(Square(2, 7)) == None
+    assert game.getPiece(Square(3, 7)) == None
+
+def test_that_castling_will_not_work_if_king_has_already_moved():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('E2 to E4')
+    game.move('E7 to E5')
+    game.move('F1 to C4')
+    game.move('D7 to D5')
+    game.move('G1 to F3')
+    game.move('A7 to A5')
+    game.move('E1 to E2')
+    game.move('A5 to A4')
+    game.move('E2 to E1')
+    game.move('A4 to A3')
+    with pytest.raises(IllegalMoveException):
+        game.move('E1 to G1')
+    
