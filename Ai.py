@@ -77,6 +77,8 @@ class Ai:
                     if isBetterThan(score, bestScoreSoFar):
                         break
                 return bestScore
+            else:
+                return Ai.BestCaseMove(None, worstScoreEver)
         else:
             moves = list(game.allLegalMoves())
             if len(moves):
@@ -94,3 +96,5 @@ class Ai:
                     if isBetterThan(score, bestScoreSoFar):
                         break
                 return bestScore
+            else:
+                return Ai.BestCaseMove(None, worstScoreEver)
