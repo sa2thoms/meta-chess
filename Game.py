@@ -1,4 +1,7 @@
 import re
+from functools import reduce
+
+from color import modchar, BLACK, WHITE
 
 from pieces.Piece import Piece
 from pieces.Pawn import Pawn
@@ -17,16 +20,6 @@ from NoRuleException import NoRuleException
 from IllegalMoveException import IllegalMoveException
 from InvalidMoveStringException import InvalidMoveStringException
 
-class bcolors:
-    PINK = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
 class Game:
 
     def __init__(self, ruleSet, promotionCallback):
@@ -36,9 +29,9 @@ class Game:
         self.whitePieces = []
         self.blackPieces = []
 
-        self.COLOR_WHITE = 0
-        self.COLOR_BLACK = 1
-        self.turn = self.COLOR_WHITE
+        self.gameTable = [[None for i in range(0, 8)] for j in range(0, 8)]
+
+        self.turn = WHITE
 
         self.moveHistory = []
 
@@ -57,13 +50,20 @@ class Game:
             raise Exception('Game is already loaded')
 
         for i in range(0, 8):
-            self.whitePieces.append(Pawn(position=Square(i, 1), color=self.COLOR_WHITE))
-            self.blackPieces.append(Pawn(position=Square(i, 6), color=self.COLOR_BLACK))
+            whiteSquare = Square(i, 1)
+            whitePawn = Pawn(position=whiteSquare, color=WHITE)
+            self.whitePieces.append(whitePawn)
+            self.gameTable[whiteSquare.file][whiteSquare.rank] = whitePawn
 
-        self._loadPowerPieces(self.COLOR_WHITE)
-        self._loadPowerPieces(self.COLOR_BLACK)
+            blackSquare = Square(i, 6)
+            blackPawn = Pawn(position=blackSquare, color=BLACK)
+            self.blackPieces.append(blackPawn)
+            self.gameTable[blackSquare.file][blackSquare.rank] = blackPawn
 
-        self.turn = self.COLOR_WHITE
+        self._loadPowerPieces(WHITE)
+        self._loadPowerPieces(BLACK)
+
+        self.turn = WHITE
 
     def printBoard(self):
         template = self.boardTemplate
@@ -73,12 +73,12 @@ class Game:
                 pieceAtLocation = self.getPiece(square)
                 symb = '  '
                 if pieceAtLocation != None:
-                    colorCode = bcolors.BLUE
-                    if pieceAtLocation.color == self.COLOR_WHITE:
-                        colorCode = bcolors.PINK
-                    elif pieceAtLocation.color == self.COLOR_BLACK:
-                        colorCode = bcolors.GREEN
-                    symb = colorCode + pieceAtLocation.symbol + bcolors.ENDC
+                    colorCode = modchar.BLUE
+                    if pieceAtLocation.color == WHITE:
+                        colorCode = modchar.PINK
+                    elif pieceAtLocation.color == BLACK:
+                        colorCode = modchar.GREEN
+                    symb = colorCode + pieceAtLocation.symbol + modchar.ENDC
                 locationCode = chr(ord('A') + col) + chr(ord('0') + row)
                 template = template.replace(locationCode, symb)
         print(template)
@@ -104,27 +104,28 @@ class Game:
         return Move(startSquare, endSquare)
 
     def oppositeColor(self, color):
-        if color == self.COLOR_BLACK:
-            return self.COLOR_WHITE
-        elif color == self.COLOR_WHITE:
-            return self.COLOR_BLACK
+        if color == BLACK:
+            return WHITE
+        elif color == WHITE:
+            return BLACK
         else:
             raise Exception('Not a valid color')
     
-    def move(self, moveIn):
+    def move(self, moveIn, knownValid = False):
         move = moveIn
         if (isinstance(move, str)):
             move = self._moveFromMoveString(moveIn)
 
         pieceForMove = self.getPiece(move.start)
-        if (pieceForMove == None):
-            raise IllegalMoveException('There is no piece at the starting location')
-        elif (pieceForMove.color != self.turn):
-            raise IllegalMoveException('Wrong colored piece')
-        elif (move.start == move.end):
-            raise IllegalMoveException('The piece cannot move to where it already was')
-        elif not self.isValidMove(move):
-            raise IllegalMoveException('That move is not allowed')
+        if not knownValid:
+            if (pieceForMove == None):
+                raise IllegalMoveException('There is no piece at the starting location')
+            elif (pieceForMove.color != self.turn):
+                raise IllegalMoveException('Wrong colored piece')
+            elif (move.start == move.end):
+                raise IllegalMoveException('The piece cannot move to where it already was')
+            elif not self.isValidMove(move):
+                raise IllegalMoveException('That move is not allowed')
 
         if (isinstance(pieceForMove, Pawn)):
             self._pawnMove(pieceForMove, move)
@@ -134,6 +135,8 @@ class Game:
                 takenPiece = self.getPiece(move.end)
                 takenPiece.taken = True
             pieceForMove.position = move.end
+            self.gameTable[move.start.file][move.start.rank] = None
+            self.gameTable[move.end.file][move.end.rank] = pieceForMove
             self._switchTurn()
             record = MoveRecord(move, pieceForMove, takenPiece)
             self.moveHistory.append(record)
@@ -151,11 +154,15 @@ class Game:
             return False
         record = self.moveHistory.pop()
         record.pieceInMotion.position = record.move.start
+        self.gameTable[record.move.end.file][record.move.end.rank] = None
         if record.pieceTaken:
             record.pieceTaken.taken = False
+            self.gameTable[record.move.end.file][record.move.end.rank] = record.pieceTaken
         if record.piecePromotedTo:
             record.pieceInMotion.taken = False
             self.whitePieces.remove(record.piecePromotedTo)
+        self.gameTable[record.move.start.file][record.move.start.rank] = record.pieceInMotion
+        self._switchTurn()
         return True
 
     def isValidMove(self, move):
@@ -176,23 +183,23 @@ class Game:
             return False
 
     def _getKing(self, color):
-        if (color == self.COLOR_WHITE):
+        if (color == WHITE):
             for piece in self.whitePieces:
                 if isinstance(piece, King):
                     return piece
-        elif (color == self.COLOR_BLACK):
+        elif (color == BLACK):
             for piece in self.blackPieces:
                 if isinstance(piece, King):
                     return piece
 
     def isKingAttacked(self, color):
         king = self._getKing(color)
-        if (color == self.COLOR_WHITE):
+        if (color == WHITE):
             for piece in self.blackPieces:
                 if (not piece.taken) and self.isAttacking(Move(piece.position, king.position)):
                     return True
             return False
-        elif (color == self.COLOR_BLACK):
+        elif (color == BLACK):
             for piece in self.whitePieces:
                 if (not piece.taken) and self.isAttacking(Move(piece.position, king.position)):
                     return True
@@ -251,16 +258,24 @@ class Game:
 
         takenPiece = self.getPiece(move.end)
         pieceForMove.position = move.end
+        self.gameTable[move.end.file][move.end.rank] = pieceForMove
+        self.gameTable[move.start.file][move.start.rank] = None
         if takenPiece:
             takenPiece.taken = True
         if self.isKingAttacked(pieceForMove.color):
             pieceForMove.position = move.start
+            self.gameTable[move.start.file][move.start.rank] = pieceForMove
+            self.gameTable[move.end.file][move.end.rank] = None
             if takenPiece:
                 takenPiece.taken = False
+                self.gameTable[move.end.file][move.end.rank] = takenPiece
             return False
         pieceForMove.position = move.start
+        self.gameTable[move.start.file][move.start.rank] = pieceForMove
+        self.gameTable[move.end.file][move.end.rank] = None
         if takenPiece:
             takenPiece.taken = False
+            self.gameTable[move.end.file][move.end.rank] = takenPiece
 
         if (isinstance(pieceForMove, Pawn)):
             return self._checkPawnValidity(move)
@@ -274,108 +289,116 @@ class Game:
                 return False
 
     def _switchTurn(self):
-        if (self.turn == self.COLOR_WHITE):
-            self.turn = self.COLOR_BLACK
+        if (self.turn == WHITE):
+            self.turn = BLACK
         else:
-            self.turn = self.COLOR_WHITE
+            self.turn = WHITE
     
     def getPiece(self, position):
-        assert(isinstance(position, Square))
+        # for piece in self.whitePieces:
+        #     if piece.position == position and piece.taken == False:
+        #         return piece
+        # for piece in self.blackPieces:
+        #     if piece.position == position and piece.taken == False:
+        #         return piece
+        return self.gameTable[position.file][position.rank]
+
+    def positionDifferential(self):
+        whiteTotal = 0.0
+        blackTotal = 0.0
+
         for piece in self.whitePieces:
-            if piece.position == position and piece.taken == False:
-                return piece
+            if not piece.taken:
+                whiteTotal += piece.pointValue()
         for piece in self.blackPieces:
-            if piece.position == position and piece.taken == False:
-                return piece
-        return None
+            if not piece.taken:
+                blackTotal += piece.pointValue()
+
+        return whiteTotal - blackTotal
+
+    def allLegalMoves(self):
+        def addAttacksToList(listOfMoves, piece):
+            return listOfMoves + list(piece.allAttackingMoves(self))
+        
+        if self.turn == WHITE:
+            attackingMoves = reduce(addAttacksToList, self.whitePieces, [])
+            validMoves = filter((lambda move: self.isValidMove(move)), attackingMoves)
+            return validMoves
+        elif self.turn == BLACK:
+            attackingMoves = reduce(addAttacksToList, self.blackPieces, [])
+            validMoves = filter((lambda move: self.isValidMove(move)), attackingMoves)
+            return validMoves
 
     def _loadPowerPieces(self, color):
         rank = color * 7
         teamList = self.whitePieces
-        if color == self.COLOR_BLACK:
+        if color == BLACK:
             teamList = self.blackPieces
 
-        teamList.append(Rook(position = Square(0, rank), color=color, movementRule=self.ruleSet.rookMovement))
-        teamList.append(Knight(position = Square(1, rank), color=color, movementRule=self.ruleSet.knightMovement))
-        teamList.append(Bishop(position = Square(2, rank), color=color, movementRule=self.ruleSet.bishopMovement))
-        teamList.append(Queen(position = Square(3, rank), color=color, movementRule=self.ruleSet.queenMovement))
-        teamList.append(King(position = Square(4, rank), color=color))
-        teamList.append(Bishop(position = Square(5, rank), color=color, movementRule=self.ruleSet.bishopMovement))
-        teamList.append(Knight(position = Square(6, rank), color=color, movementRule=self.ruleSet.knightMovement))
-        teamList.append(Rook(position = Square(7, rank), color=color, movementRule=self.ruleSet.rookMovement))
+        newPieces = [
+            Rook(position = Square(0, rank), color=color, movementRule=self.ruleSet.rookMovement),
+            Knight(position = Square(1, rank), color=color, movementRule=self.ruleSet.knightMovement),
+            Bishop(position = Square(2, rank), color=color, movementRule=self.ruleSet.bishopMovement),
+            Queen(position = Square(3, rank), color=color, movementRule=self.ruleSet.queenMovement),
+            King(position = Square(4, rank), color=color),
+            Bishop(position = Square(5, rank), color=color, movementRule=self.ruleSet.bishopMovement),
+            Knight(position = Square(6, rank), color=color, movementRule=self.ruleSet.knightMovement),
+            Rook(position = Square(7, rank), color=color, movementRule=self.ruleSet.rookMovement)
+        ]
+
+        fileAt = 0
+        for piece in newPieces:
+            teamList.append(piece)
+            self.gameTable[fileAt][rank] = piece
+            fileAt += 1
 
     def _checkPawnValidity(self, move):
+        pieceForMove = self.getPiece(move.start)
 
-        if (self.turn == self.COLOR_WHITE):
-            oneForward = None
-            if move.start.rank + 1 < 8:
-                oneForward = Square(move.start.file, move.start.rank + 1)
-            twoForward = None
-            if move.start.rank + 2 < 8:
-                twoForward = Square(move.start.file, move.start.rank + 2)
-            if oneForward and (move.end == oneForward):
-                if (self.getPiece(move.end) != None):
+        forward = 1
+        startRank = 1
+        endRank = 7
+        lessInRank = lambda a, b: a < b
+        if pieceForMove.color == BLACK:
+            forward = -1
+            startRank = 6
+            endRank = 0
+            lessInRank = lambda a, b: a > b
+        
+        oneForward = None
+        if lessInRank(move.start.rank, endRank):
+            oneForward = Square(move.start.file, move.start.rank + forward)
+        twoForward = None
+        if lessInRank(move.start.rank + forward, endRank):
+            twoForward = Square(move.start.file, move.start.rank + forward * 2)
+        if oneForward and (move.end == oneForward):
+            if (self.getPiece(move.end) != None):
+                return False
+            else:
+                return True
+        elif twoForward and (move.end == twoForward):
+            if (move.start.rank != startRank):
+                return False
+            elif (self.getPiece(move.end) != None):
+                return False
+            elif (self.getPiece(oneForward) != None):
+                return False
+            else:
+                return True
+        elif (move.start.rank + forward == move.end.rank and abs(move.start.file - move.end.file) == 1):
+            if (self.getPiece(move.end) == None):
+                if (len(self.moveHistory) == 0):
                     return False
-                else:
+                previousMove = self.moveHistory[-1]
+                if (move.start.rank == (startRank + forward * 3) and previousMove.move.start == Square(move.end.file, (startRank + forward * 5)) and previousMove.move.end == Square(move.end.file, (startRank + forward * 3)) and isinstance(previousMove.pieceInMotion, Pawn)):
+                    # This is where the pawn takes en passant
                     return True
-            elif twoForward and (move.end == twoForward):
-                if (move.start.rank != 1):
-                    return False
-                elif (self.getPiece(move.end) != None):
-                    return False
-                elif (self.getPiece(oneForward) != None):
-                    return False
                 else:
-                    return True
-            elif (move.start.rank + 1 == move.end.rank and abs(move.start.file - move.end.file) == 1):
-                if (self.getPiece(move.end) == None):
-                    if (len(self.moveHistory) == 0):
-                        return False
-                    previousMove = self.moveHistory[-1]
-                    if (move.start.rank == 4 and previousMove.move.start == Square(move.end.file, 6) and previousMove.move.end == Square(move.end.file, 4) and isinstance(previousMove.pieceInMotion, Pawn)):
-                        # This is where the pawn takes en passant
-                        return True
-                    else:
-                        return False
-                elif (self.getPiece(move.end).color == self.COLOR_WHITE):
                     return False
-                else:
-                    return True
-        elif (self.turn == self.COLOR_BLACK):
-            oneForward = None
-            if move.start.rank - 1 >= 0:
-                oneForward = Square(move.start.file, move.start.rank - 1)
-            twoForward = None
-            if move.start.rank - 2 >= 0:
-                twoForward = Square(move.start.file, move.start.rank - 2)
-            if oneForward and (move.end == oneForward):
-                if (self.getPiece(move.end) != None):
-                    return False
-                else:
-                    return True
-            elif twoForward and (move.end == twoForward):
-                if (move.start.rank != 6):
-                    return False
-                elif (self.getPiece(move.end) != None):
-                    return False
-                elif (self.getPiece(oneForward) != None):
-                    return False
-                else:
-                    return True
-            elif (move.start.rank - 1 == move.end.rank and abs(move.start.file - move.end.file) == 1):
-                if (self.getPiece(move.end) == None):
-                    if (len(self.moveHistory) == 0):
-                        return False
-                    previousMove = self.moveHistory[-1]
-                    if (move.start.rank == 3 and previousMove.move.start == Square(move.end.file, 1) and previousMove.move.end == Square(move.end.file, 3) and isinstance(previousMove.pieceInMotion, Pawn)):
-                        # This is where the pawn takes en passant
-                        return True
-                    else:
-                        return False
-                elif (self.getPiece(move.end).color == self.COLOR_BLACK):
-                    return False
-                else:
-                    return True
+            elif (self.getPiece(move.end).color == pieceForMove.color):
+                return False
+            else:
+                return True
 
     def getPromotionPiece(self, pawn):
         choice = self.promotionCallback()
@@ -391,137 +414,92 @@ class Game:
             raise Exception('The promotion callback did not return an expected piece letter')
 
     def _pawnMove(self, pieceForMove, move):
+        forward = 1
+        startRank = 1
+        endRank = 7
+        lessInRank = lambda a, b: a < b
+        if pieceForMove.color == BLACK:
+            forward = -1
+            startRank = 6
+            endRank = 0
+            lessInRank = lambda a, b: a > b
+
         assert(isinstance(pieceForMove, Pawn))
-        if (self.turn == self.COLOR_WHITE):
-            oneForward = None
-            if move.start.rank + 1 < 8:
-                oneForward = Square(move.start.file, move.start.rank + 1)
-            twoForward = None
-            if move.start.rank + 2 < 8:
-                twoForward = Square(move.start.file, move.start.rank + 2)
-            if oneForward and (move.end == oneForward):
-                if (self.getPiece(move.end) != None):
-                    raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
-                else:
-                    pieceForMove.position = move.end
-                    piecePromotedTo = None
-                    if pieceForMove.position.rank == 7:
-                        piecePromotedTo = self.getPromotionPiece(pieceForMove)
-                        self.whitePieces.append(piecePromotedTo)
-                        pieceForMove.taken = True
-                    self._switchTurn()
-                    record = MoveRecord(move, pieceForMove, piecePromotedTo=piecePromotedTo)
-                    self.moveHistory.append(record)
-            elif twoForward and (move.end == twoForward):
-                if (move.start.rank != 1):
-                    raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
-                elif (self.getPiece(move.end) != None):
-                    raise IllegalMoveException('A pawn may not take a piece directly in front of it')
-                elif (self.getPiece(oneForward) != None):
-                    raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
-                else:
-                    pieceForMove.position = move.end
-                    piecePromotedTo = None
-                    if pieceForMove.position.rank == 7:
-                        piecePromotedTo = self.getPromotionPiece(pieceForMove)
-                        self.whitePieces.append(piecePromotedTo)
-                        pieceForMove.taken = True
-                    self._switchTurn()
-                    record = MoveRecord(move, pieceForMove, piecePromotedTo=piecePromotedTo)
-                    self.moveHistory.append(record)
-            elif (move.start.rank + 1 == move.end.rank and abs(move.start.file - move.end.file) == 1):
-                if (self.getPiece(move.end) == None):
-                    if (len(self.moveHistory) == 0):
-                        raise IllegalMoveException('You cannot move a pawn diagonally except to take')
-                    previousMove = self.moveHistory[-1]
-                    if (move.start.rank == 4 and previousMove.move.start == Square(move.end.file, 6) and previousMove.move.end == Square(move.end.file, 4) and isinstance(previousMove.pieceInMotion, Pawn)):
-                        # This is where the pawn takes en passant
-                        takenPiece = previousMove.pieceInMotion
-                        takenPiece.taken = True
-                        pieceForMove.position = move.end
-                        self._switchTurn()
-                        record = MoveRecord(move, pieceForMove, takenPiece)
-                        self.moveHistory.append(record)
-                    else:
-                        raise IllegalMoveException('Pawns can only move diagonally to take')
-                elif (self.getPiece(move.end).color == self.COLOR_WHITE):
-                    raise IllegalMoveException('You may not take your own piece')
-                else:
-                    takenPiece = self.getPiece(move.end)
+        oneForward = None
+        if lessInRank(move.start.rank, endRank):
+            oneForward = Square(move.start.file, move.start.rank + forward)
+        twoForward = None
+        if lessInRank(move.start.rank + forward, endRank):
+            twoForward = Square(move.start.file, move.start.rank + forward * 2)
+        if move.end == oneForward:
+            if (self.getPiece(move.end) != None):
+                raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
+            else:
+                pieceForMove.position = move.end
+                self.gameTable[move.end.file][move.end.rank] = pieceForMove
+                self.gameTable[move.start.file][move.start.rank] = None
+                piecePromotedTo = None
+                if pieceForMove.position.rank == endRank:
+                    piecePromotedTo = self.getPromotionPiece(pieceForMove)
+                    self.whitePieces.append(piecePromotedTo)
+                    self.gameTable[move.end.file][move.end.rank] = piecePromotedTo
+                    pieceForMove.taken = True
+                self._switchTurn()
+                record = MoveRecord(move, pieceForMove, piecePromotedTo=piecePromotedTo)
+                self.moveHistory.append(record)
+        elif twoForward and (move.end == twoForward):
+            if (move.start.rank != startRank):
+                raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
+            elif (self.getPiece(move.end) != None):
+                raise IllegalMoveException('A pawn may not take a piece directly in front of it')
+            elif (self.getPiece(oneForward) != None):
+                raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
+            else:
+                pieceForMove.position = move.end
+                self.gameTable[move.end.file][move.end.rank] = pieceForMove
+                self.gameTable[move.start.file][move.start.rank] = None
+                piecePromotedTo = None
+                if pieceForMove.position.rank == endRank:
+                    piecePromotedTo = self.getPromotionPiece(pieceForMove)
+                    self.whitePieces.append(piecePromotedTo)
+                    self.gameTable[move.end.file][move.end.rank] = piecePromotedTo
+                    pieceForMove.taken = True
+                self._switchTurn()
+                record = MoveRecord(move, pieceForMove, piecePromotedTo=piecePromotedTo)
+                self.moveHistory.append(record)
+        elif (move.start.rank + forward == move.end.rank and abs(move.start.file - move.end.file) == 1):
+            if (self.getPiece(move.end) == None):
+                if (len(self.moveHistory) == 0):
+                    raise IllegalMoveException('You cannot move a pawn diagonally except to take')
+                previousMove = self.moveHistory[-1]
+                if (move.start.rank == (startRank + forward * 3) and previousMove.move.start == Square(move.end.file, (startRank + forward * 5)) and previousMove.move.end == Square(move.end.file, (startRank + forward * 3)) and isinstance(previousMove.pieceInMotion, Pawn)):
+                    # This is where the pawn takes en passant
+                    takenPiece = previousMove.pieceInMotion
+                    self.gameTable[takenPiece.position.file][takenPiece.position.rank] = None
                     takenPiece.taken = True
                     pieceForMove.position = move.end
-                    piecePromotedTo = None
-                    if pieceForMove.position.rank == 7:
-                        piecePromotedTo = self.getPromotionPiece(pieceForMove)
-                        self.whitePieces.append(piecePromotedTo)
-                        pieceForMove.taken = True
+                    self.gameTable[move.end.file][move.end.rank] = pieceForMove
+                    self.gameTable[move.start.file][move.start.rank] = None
                     self._switchTurn()
-                    record = MoveRecord(move, pieceForMove, pieceTaken=takenPiece, piecePromotedTo=piecePromotedTo)
+                    record = MoveRecord(move, pieceForMove, takenPiece)
                     self.moveHistory.append(record)
-        elif (self.turn == self.COLOR_BLACK):
-            oneForward = None
-            if move.start.rank - 1 >= 0:
-                oneForward = Square(move.start.file, move.start.rank - 1)
-            twoForward = None
-            if move.start.rank - 2 >= 0:
-                twoForward = Square(move.start.file, move.start.rank - 2)
-            if oneForward and (move.end == oneForward):
-                if (self.getPiece(move.end) != None):
-                    raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
                 else:
-                    pieceForMove.position = move.end
-                    piecePromotedTo = None
-                    if pieceForMove.position.rank == 0:
-                        piecePromotedTo = self.getPromotionPiece(pieceForMove)
-                        self.blackPieces.append(piecePromotedTo)
-                        pieceForMove.taken = True
-                    self._switchTurn()
-                    record = MoveRecord(move, pieceForMove, piecePromotedTo=piecePromotedTo)
-                    self.moveHistory.append(record)
-            elif twoForward and (move.end == twoForward):
-                if (move.start.rank != 6):
-                    raise IllegalMoveException('A pawn may only move two spaces on its first move of the game')
-                elif (self.getPiece(move.end) != None):
-                    raise IllegalMoveException('A pawn may not take a piece directly in front of it')
-                elif (self.getPiece(oneForward) != None):
-                    raise IllegalMoveException('There is a piece blocking the pawn from moving forward')
-                else:
-                    pieceForMove.position = move.end
-                    piecePromotedTo = None
-                    if pieceForMove.position.rank == 0:
-                        piecePromotedTo = self.getPromotionPiece(pieceForMove)
-                        self.blackPieces.append(piecePromotedTo)
-                        pieceForMove.taken = True
-                    self._switchTurn()
-                    record = MoveRecord(move, pieceForMove, piecePromotedTo=piecePromotedTo)
-                    self.moveHistory.append(record)
-            elif (move.start.rank - 1 == move.end.rank and abs(move.start.file - move.end.file) == 1):
-                if (self.getPiece(move.end) == None):
-                    if (len(self.moveHistory) == 0):
-                        raise IllegalMoveException('A pawn cannot move diagonally except to take')
-                    previousMove = self.moveHistory[-1]
-                    if (move.start.rank == 3 and previousMove.move.start == Square(move.end.file, 1) and previousMove.move.end == Square(move.end.file, 3) and isinstance(previousMove.pieceInMotion, Pawn)):
-                        # This is where the pawn takes en passant
-                        takenPiece = previousMove.pieceInMotion
-                        takenPiece.taken = True
-                        pieceForMove.position = move.end
-                        self._switchTurn()
-                        record = MoveRecord(move, pieceForMove, takenPiece)
-                        self.moveHistory.append(record)
-                    else:
-                        raise IllegalMoveException('Pawns can only move diagonally to take')
-                elif (self.getPiece(move.end).color == self.COLOR_BLACK):
-                    raise IllegalMoveException('You may not take your own piece')
-                else:
-                    takenPiece = self.getPiece(move.end)
-                    takenPiece.taken = True
-                    pieceForMove.position = move.end
-                    piecePromotedTo = None
-                    if pieceForMove.position.rank == 0:
-                        piecePromotedTo = self.getPromotionPiece(pieceForMove)
-                        self.blackPieces.append(piecePromotedTo)
-                        pieceForMove.taken = True
-                    self._switchTurn()
-                    record = MoveRecord(move, pieceForMove, pieceTaken=takenPiece, piecePromotedTo=piecePromotedTo)
-                    self.moveHistory.append(record)
+                    raise IllegalMoveException('Pawns can only move diagonally to take')
+            elif (self.getPiece(move.end).color == pieceForMove.color):
+                raise IllegalMoveException('You may not take your own piece')
+            else:
+                takenPiece = self.getPiece(move.end)
+                takenPiece.taken = True
+                pieceForMove.position = move.end
+                self.gameTable[move.end.file][move.end.rank] = pieceForMove
+                self.gameTable[move.start.file][move.start.rank] = None
+                piecePromotedTo = None
+                if pieceForMove.position.rank == endRank:
+                    piecePromotedTo = self.getPromotionPiece(pieceForMove)
+                    self.whitePieces.append(piecePromotedTo)
+                    self.gameTable[move.end.file][move.end.rank] = piecePromotedTo
+                    pieceForMove.taken = True
+                self._switchTurn()
+                record = MoveRecord(move, pieceForMove, pieceTaken=takenPiece, piecePromotedTo=piecePromotedTo)
+                self.moveHistory.append(record)
 
