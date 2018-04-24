@@ -134,11 +134,24 @@ class Game:
             if self.getPiece(move.end):
                 takenPiece = self.getPiece(move.end)
                 takenPiece.taken = True
+            castleMove = None
+            if isinstance(pieceForMove, King) and abs(move.start.file - move.end.file) == 2:
+                castleInMotion = self.getPiece(Square(0, pieceForMove.position.rank))
+                castleStart = castleInMotion.position
+                castleEnd = Square(3, pieceForMove.position.rank)
+                if move.end.file > move.start.file:
+                    castleInMotion = self.getPiece(Square(7, pieceForMove.position.rank))
+                    castleStart = castleInMotion.position
+                    castleEnd = Square(5, pieceForMove.position.rank)
+                castleMove = MoveRecord(Move(castleStart, castleEnd), castleInMotion)
+                castleInMotion.position = castleEnd
+                self.gameTable[castleStart.file][castleStart.rank] = None
+                self.gameTable[castleEnd.file][castleEnd.rank] = castleInMotion
             pieceForMove.position = move.end
             self.gameTable[move.start.file][move.start.rank] = None
             self.gameTable[move.end.file][move.end.rank] = pieceForMove
             self._switchTurn()
-            record = MoveRecord(move, pieceForMove, takenPiece)
+            record = MoveRecord(move, pieceForMove, takenPiece, castleMove=castleMove)
             self.moveHistory.append(record)
 
         if self.isKingAttacked(self.oppositeColor(pieceForMove.color)):
@@ -161,6 +174,12 @@ class Game:
         if record.piecePromotedTo:
             record.pieceInMotion.taken = False
             self.whitePieces.remove(record.piecePromotedTo)
+        if record.castleMove:
+            castle = record.castleMove.pieceInMotion
+            m = record.castleMove.move
+            castle.position = m.start
+            self.gameTable[m.start.file][m.start.rank] = castle
+            self.gameTable[m.end.file][m.end.rank] = None
         self.gameTable[record.move.start.file][record.move.start.rank] = record.pieceInMotion
         self._switchTurn()
         return True
@@ -181,6 +200,16 @@ class Game:
             return pieceForMove.isAttacking(moveArray.end, self)
         else:
             return False
+
+    def isAttacked(self, square, color):
+        if color == WHITE:
+            for piece in self.whitePieces:
+                if piece.isAttacking(square, self):
+                    return True
+        elif color == BLACK:
+            for piece in self.blackPieces:
+                if piece.isAttacking(square, self):
+                    return True
 
     def _getKing(self, color):
         if (color == WHITE):
@@ -255,6 +284,43 @@ class Game:
             return False
         elif (move.start == move.end):
             return False
+
+        if isinstance(pieceForMove, King) and abs(move.end.file - move.start.file) == 2:
+            # Checking if this is a valid castling move
+            if move.end.rank != move.start.rank:
+                return False
+            elif self.isKingAttacked(pieceForMove.color):
+                return False
+            else:
+                if move.end.file == 2:
+                    if self.isAttacked(Square(3, move.start.rank), self.oppositeColor(pieceForMove.color)):
+                        return False
+                    elif self.isAttacked(Square(2, move.start.rank), self.oppositeColor(pieceForMove.color)):
+                        return False
+                    elif self.getPiece(Square(3, move.start.rank)) or self.getPiece(Square(2, move.start.rank)) or self.getPiece(Square(1, move.start.rank)):
+                        return False
+                    else:
+                        castle = self.getPiece(Square(0, move.start.rank))
+                        if castle == None or not isinstance(castle, Rook):
+                            return False
+                        for record in self.moveHistory:
+                            if record.pieceInMotion == castle or record.pieceInMotion == pieceForMove:
+                                return False
+                elif move.end.file == 6:
+                    if self.isAttacked(Square(5, move.start.rank), self.oppositeColor(pieceForMove.color)):
+                        return False
+                    elif self.isAttacked(Square(6, move.start.rank), self.oppositeColor(pieceForMove.color)):
+                        return False
+                    elif self.getPiece(Square(5, move.start.rank)) or self.getPiece(Square(6, move.start.rank)):
+                        return False
+                    else:
+                        castle = self.getPiece(Square(7, move.start.rank))
+                        if castle == None or not isinstance(castle, Rook):
+                            return False
+                        for record in self.moveHistory:
+                            if record.pieceInMotion == castle or record.pieceInMotion == pieceForMove:
+                                return False
+                return True
 
         takenPiece = self.getPiece(move.end)
         pieceForMove.position = move.end
