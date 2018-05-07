@@ -112,7 +112,7 @@ class AiRepl:
                         self.state = result
                     elif result == 'mate':
                         winning = 'White'
-                        if (self.game.turn == self.WHITE):
+                        if (self.game.turn == WHITE):
                             winning = 'Black'
                         self.game.printBoard()
                         print("Checkmate! " + winning + " has won by checkmate.")
