@@ -1,15 +1,18 @@
 from pieces.MovementRule import MovementRule
 from RuleSet import RuleSet
 from Game import Game
-from GameRepl import GameRepl
+from AiRepl import AiRepl
+
+from color import WHITE, BLACK
 
 import SimonsChessConfig
 
 def main():
     rules = SimonsChessConfig.ruleSet
 
-    gameRepl = GameRepl(rules)
-    gameRepl.run()
+    searchDepth = 3
+    aiRepl = AiRepl(rules, searchDepth, BLACK)
+    aiRepl.run()
 
 if __name__ == '__main__':
     main()
