@@ -51,33 +51,33 @@ m = ratio*canvasSize
 for i in range(squares):
     for j in range(squares):
         fillchoice = colours[(i+j)%2]
-        w.create_rectangle(i*m, j*m,(i+1)*m,(j+1)*m, fill=fillchoice)
+        w.create_rectangle(i*m, j*m,(i+1)*m,(j+1)*m, fill=fillchoice, tag="squares")
 
 
 row = 0
-w.create_image(0*m+m/2, row*m+m/2, image = blackRook)
-w.create_image(1*m+m/2, row*m+m/2, image = blackKnight)
-w.create_image(2*m+m/2, row*m+m/2, image = blackBishop)
-w.create_image(3*m+m/2, row*m+m/2, image = blackKing)
-w.create_image(4*m+m/2, row*m+m/2, image = blackQueen)
-w.create_image(5*m+m/2, row*m+m/2, image = blackBishop)
-w.create_image(6*m+m/2, row*m+m/2, image = blackKnight)
-w.create_image(7*m+m/2, row*m+m/2, image = blackRook)
+w.create_image(0*m+m/2, row*m+m/2, image = blackRook, tag="bR")
+w.create_image(1*m+m/2, row*m+m/2, image = blackKnight, tag="bN")
+w.create_image(2*m+m/2, row*m+m/2, image = blackBishop, tag="bB")
+w.create_image(3*m+m/2, row*m+m/2, image = blackKing, tag="bK")
+w.create_image(4*m+m/2, row*m+m/2, image = blackQueen, tag="bQ")
+w.create_image(5*m+m/2, row*m+m/2, image = blackBishop, tag="bB")
+w.create_image(6*m+m/2, row*m+m/2, image = blackKnight, tag="bN")
+w.create_image(7*m+m/2, row*m+m/2, image = blackRook, tag="bR")
 for j in range (squares):
-    w.create_image(j*m+m/2, (row+1)*m+m/2, image = blackPawn)
+    w.create_image(j*m+m/2, (row+1)*m+m/2, image = blackPawn, tag = "bP")
 
 row = 7
-w.create_image(0*m+m/2, row*m+m/2, image = whiteRook)
-w.create_image(1*m+m/2, row*m+m/2, image = whiteKnight)
-w.create_image(2*m+m/2, row*m+m/2, image = whiteBishop)
-w.create_image(3*m+m/2, row*m+m/2, image = whiteKing)
-w.create_image(4*m+m/2, row*m+m/2, image = whiteQueen)
-w.create_image(5*m+m/2, row*m+m/2, image = whiteBishop)
-w.create_image(6*m+m/2, row*m+m/2, image = whiteKnight)
-w.create_image(7*m+m/2, row*m+m/2, image = whiteRook)
+w.create_image(0*m+m/2, row*m+m/2, image = whiteRook, tag="bR")
+w.create_image(1*m+m/2, row*m+m/2, image = whiteKnight, tag="bN")
+w.create_image(2*m+m/2, row*m+m/2, image = whiteBishop, tag="bB")
+w.create_image(3*m+m/2, row*m+m/2, image = whiteKing, tag="bK")
+w.create_image(4*m+m/2, row*m+m/2, image = whiteQueen, tag="bQ")
+w.create_image(5*m+m/2, row*m+m/2, image = whiteBishop, tag="bB")
+w.create_image(6*m+m/2, row*m+m/2, image = whiteKnight, tag="bN")
+w.create_image(7*m+m/2, row*m+m/2, image = whiteRook, tag="bR")
 for j in range (squares):
-    w.create_image(j*m+m/2, (row-1)*m+m/2, image = whitePawn)
-w.addtag_all("all")
+    w.create_image(j*m+m/2, (row-1)*m+m/2, image = whitePawn, tag="bP")
 
+w.addtag_all("all")
 
 mainloop()
