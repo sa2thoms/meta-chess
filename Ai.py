@@ -84,8 +84,12 @@ class Ai:
             if len(moves):
                 bestScore = Ai.BestCaseMove(moves[0], worstScoreEver)
                 for move in moves:
-                    game.move(move, knownValid=True)
-                    score = self._getBestMoveAtDepth(bestScore.differential, depth - 1, game).differential
+                    result = game.move(move, knownValid=True)
+                    score = 0
+                    if result == 'mate':
+                        score = -worstScoreEver
+                    else:
+                        score = self._getBestMoveAtDepth(bestScore.differential, depth - 1, game).differential
                     if isBetterThan(score, bestScore.differential):
                         bestScore.move = move
                         bestScore.differential = score
