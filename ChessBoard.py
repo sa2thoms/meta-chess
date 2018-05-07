@@ -1,5 +1,23 @@
 from tkinter import *
 
+class ResizingCanvas(Canvas):
+    def __init__(self,parent,**kwargs):
+        Canvas.__init__(self,parent,**kwargs)
+        self.bind("<Configure>", self.on_resize)
+        self.height = self.winfo_reqheight()
+        self.width = self.winfo_reqwidth()
+
+    def on_resize(self,event):
+        # determine the ratio of old width/height to new width/height
+        scale = float(event.width)/self.width
+        self.width = event.width
+        self.height = event.width
+        # resize the canvas 
+        self.config(width=self.width, height=self.height)
+        # rescale all the objects tagged with the "all" tag
+        self.scale("all",0,0,scale,scale)
+
+
 canvasSize = 800
 
 colours = ("#EADDC5", "#BA893C")
@@ -7,11 +25,13 @@ squares = 8
 ratio = 1/squares
 
 master = Tk()
+myframe = Frame(master)
+myframe.pack(fill=BOTH, expand=YES)
 
-w = Canvas(master, 
+w = ResizingCanvas(myframe, 
            width=canvasSize, 
-           height=canvasSize)
-w.pack()
+           height=canvasSize, highlightthickness=0)
+w.pack(fill=BOTH, expand=YES)
 
 blackKing = PhotoImage(file = "images/bK.gif")
 blackQueen = PhotoImage(file = "images/bQ.gif")
@@ -57,6 +77,7 @@ w.create_image(6*m+m/2, row*m+m/2, image = whiteKnight)
 w.create_image(7*m+m/2, row*m+m/2, image = whiteRook)
 for j in range (squares):
     w.create_image(j*m+m/2, (row-1)*m+m/2, image = whitePawn)
+w.addtag_all("all")
 
 
 mainloop()
