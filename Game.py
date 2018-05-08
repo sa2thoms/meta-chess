@@ -137,7 +137,9 @@ class Game:
             castleMove = None
             if isinstance(pieceForMove, King) and abs(move.start.file - move.end.file) == 2:
                 castleInMotion = self.getPiece(Square(0, pieceForMove.position.rank))
-                castleStart = castleInMotion.position
+                castleStart = None
+                if castleInMotion:
+                    castleStart = castleInMotion.position
                 castleEnd = Square(3, pieceForMove.position.rank)
                 if move.end.file > move.start.file:
                     castleInMotion = self.getPiece(Square(7, pieceForMove.position.rank))
