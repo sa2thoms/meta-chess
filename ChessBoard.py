@@ -1,4 +1,8 @@
 from tkinter import *
+import NormalChessConfig
+from Game import Game
+from pieces.Piece import Piece
+from Square import Square
 
 class ResizingCanvas(Canvas):
     def __init__(self,parent,**kwargs):
@@ -17,6 +21,14 @@ class ResizingCanvas(Canvas):
         # rescale all the objects tagged with the "all" tag
         self.scale("all",0,0,scale,scale)
 
+def promoCallback():
+    return 'q' #this means a pawn always promotes to a queen upon reaching the other side of the board
+
+# this is your instance of the game object, and it now has standard rules
+myGame = Game(NormalChessConfig.ruleSet, promoCallback)
+
+# myGame will not have any pieces until you call load on it
+myGame.load()
 
 canvasSize = 800
 
@@ -52,31 +64,32 @@ for i in range(squares):
     for j in range(squares):
         fillchoice = colours[(i+j)%2]
         w.create_rectangle(i*m, j*m,(i+1)*m,(j+1)*m, fill=fillchoice, tag="squares")
+        thisPiece = myGame.getPiece(Square(i,j))
+        #print (position, " ", piece[p,r])
 
+#row = 0
+#w.create_image(0*m+m/2, row*m+m/2, image = blackRook, tag="bR")
+#w.create_image(1*m+m/2, row*m+m/2, image = blackKnight, tag="bN")
+#w.create_image(2*m+m/2, row*m+m/2, image = blackBishop, tag="bB")
+#w.create_image(3*m+m/2, row*m+m/2, image = blackKing, tag="bK")
+#w.create_image(4*m+m/2, row*m+m/2, image = blackQueen, tag="bQ")
+#w.create_image(5*m+m/2, row*m+m/2, image = blackBishop, tag="bB")
+#w.create_image(6*m+m/2, row*m+m/2, image = blackKnight, tag="bN")
+#w.create_image(7*m+m/2, row*m+m/2, image = blackRook, tag="bR")
+#for j in range (squares):
+#    w.create_image(j*m+m/2, (row+1)*m+m/2, image = blackPawn, tag = "bP")
 
-row = 0
-w.create_image(0*m+m/2, row*m+m/2, image = blackRook, tag="bR")
-w.create_image(1*m+m/2, row*m+m/2, image = blackKnight, tag="bN")
-w.create_image(2*m+m/2, row*m+m/2, image = blackBishop, tag="bB")
-w.create_image(3*m+m/2, row*m+m/2, image = blackKing, tag="bK")
-w.create_image(4*m+m/2, row*m+m/2, image = blackQueen, tag="bQ")
-w.create_image(5*m+m/2, row*m+m/2, image = blackBishop, tag="bB")
-w.create_image(6*m+m/2, row*m+m/2, image = blackKnight, tag="bN")
-w.create_image(7*m+m/2, row*m+m/2, image = blackRook, tag="bR")
-for j in range (squares):
-    w.create_image(j*m+m/2, (row+1)*m+m/2, image = blackPawn, tag = "bP")
-
-row = 7
-w.create_image(0*m+m/2, row*m+m/2, image = whiteRook, tag="bR")
-w.create_image(1*m+m/2, row*m+m/2, image = whiteKnight, tag="bN")
-w.create_image(2*m+m/2, row*m+m/2, image = whiteBishop, tag="bB")
-w.create_image(3*m+m/2, row*m+m/2, image = whiteKing, tag="bK")
-w.create_image(4*m+m/2, row*m+m/2, image = whiteQueen, tag="bQ")
-w.create_image(5*m+m/2, row*m+m/2, image = whiteBishop, tag="bB")
-w.create_image(6*m+m/2, row*m+m/2, image = whiteKnight, tag="bN")
-w.create_image(7*m+m/2, row*m+m/2, image = whiteRook, tag="bR")
-for j in range (squares):
-    w.create_image(j*m+m/2, (row-1)*m+m/2, image = whitePawn, tag="bP")
+#row = 7
+#w.create_image(0*m+m/2, row*m+m/2, image = whiteRook, tag="wR")
+#w.create_image(1*m+m/2, row*m+m/2, image = whiteKnight, tag="wN")
+#w.create_image(2*m+m/2, row*m+m/2, image = whiteBishop, tag="wB")
+#w.create_image(3*m+m/2, row*m+m/2, image = whiteKing, tag="wK")
+#w.create_image(4*m+m/2, row*m+m/2, image = whiteQueen, tag="wQ")
+#w.create_image(5*m+m/2, row*m+m/2, image = whiteBishop, tag="wB")
+#w.create_image(6*m+m/2, row*m+m/2, image = whiteKnight, tag="wN")
+#w.create_image(7*m+m/2, row*m+m/2, image = whiteRook, tag="wR")
+#for j in range (squares):
+#    w.create_image(j*m+m/2, (row-1)*m+m/2, image = whitePawn, tag="wP")
 
 w.addtag_all("all")
 
