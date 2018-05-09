@@ -1,6 +1,10 @@
 Add saving and loading of games
     Implement AI portion in C++
 Add Webserver
-    Add GUI
+Add GUI
+
+Implement stalemate
+Implement three-fold repetition
+Implement the 30-move rule
 
 Implement Entire Game in C++
