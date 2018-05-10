@@ -76,6 +76,8 @@ class ChessBoard:
 
     def mapPieces(self):
 
+        self.myCanvas.delete("bP", "bR", "bN", "bB", "bQ", "bK")
+        
         M = self.M
         for i in range(self.SQUARES):
             for j in range(self.SQUARES):
