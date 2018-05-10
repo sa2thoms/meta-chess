@@ -14,4 +14,5 @@ myGame.load()
 
 master = Tk()
 myChessBoard = ChessBoard(master, myGame)
+myChessBoard.printSquares()
 master.mainloop()
