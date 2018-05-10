@@ -32,7 +32,7 @@ class King(Piece):
                 if square != self.position:
                     moves.append(Move(self.position, square))
 
-        if self.position == Square(7 * self.color, 4):
+        if self.position == Square(4, 7 * self.color):
             moves.append(Move(self.position, Square(self.position.file - 2, self.position.rank)))
             moves.append(Move(self.position, Square(self.position.file + 2, self.position.rank)))
         

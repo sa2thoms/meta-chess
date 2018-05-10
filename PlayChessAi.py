@@ -10,7 +10,7 @@ import NormalChessConfig
 def main():
     rules = NormalChessConfig.ruleSet
 
-    searchDepth = 4
+    searchDepth = 3
     aiRepl = AiRepl(rules, searchDepth, BLACK)
     aiRepl.run()
 

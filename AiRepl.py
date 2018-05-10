@@ -149,7 +149,11 @@ class AiRepl:
             if not self.promoting:
                 resp = self.game.undoLastMove()
                 if resp:
-                    return 'undone'
+                    resp2 = self.game.undoLastMove()
+                    if resp2:
+                        return 'undone'
+                    else:
+                        return 'partly undone'
                 else:
                     return 'not undone'
             else:
