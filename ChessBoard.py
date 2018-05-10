@@ -3,6 +3,7 @@ from pieces.Piece import Piece
 from Square import Square
 from pieceImages import pieceImages
 from color import squareColors
+from Ai import Ai
 
 class ResizingCanvas(Canvas):
     def __init__(self,parent,**kwargs):
@@ -66,9 +67,17 @@ class ChessBoard:
 
         self.myCanvas.addtag_all("all")
 
+        self.myCanvas.bind('<Button-1>', self.aiMakeMove)
+
+    def aiMakeMove(self, event):
+        ai = Ai(3)
+        print(self.myGame.move(ai.bestMove(self.myGame)))
+        self.mapPieces()
 
     def mapPieces(self):
 
+        self.myCanvas.delete("pieces")
+        
         M = self.M
         self.myCanvas.delete("pieces")
         for i in range(self.SQUARES):
@@ -77,30 +86,29 @@ class ChessBoard:
                 if (thisPiece):
                     if (thisPiece.color == 0):
                         if (thisPiece.symbol == 'pa'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackPawn, tag = "bP")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackPawn, tag = ("bP","pieces"))
                         if (thisPiece.symbol == 'ro'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackRook, tag="bR")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackRook, tag=("bR","pieces"))
                         if (thisPiece.symbol == 'kn'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackKnight, tag="bN")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackKnight, tag=("bN","pieces"))
                         if (thisPiece.symbol == 'bi'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackBishop, tag="bB")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackBishop, tag=("bB","pieces"))
                         if (thisPiece.symbol == 'Qu'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackQueen, tag="bQ")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackQueen, tag=("bQ","pieces"))
                         if (thisPiece.symbol == 'Ki'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackKing, tag="bK")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.blackKing, tag=("bK","pieces"))
                     if (thisPiece.color == 1):
                         if (thisPiece.symbol == 'pa'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whitePawn, tag = "bP")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whitePawn, tag = ("wP","pieces"))
                         if (thisPiece.symbol == 'ro'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteRook, tag="bR")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteRook, tag=("wR","pieces"))
                         if (thisPiece.symbol == 'kn'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteKnight, tag="bN")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteKnight, tag=("wN","pieces"))
                         if (thisPiece.symbol == 'bi'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteBishop, tag="bB")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteBishop, tag=("wB","pieces"))
                         if (thisPiece.symbol == 'Qu'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteQueen, tag="bQ")
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteQueen, tag=("wQ","pieces"))
                         if (thisPiece.symbol == 'Ki'):
-                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteKing, tag="bK")        
-        self.myCanvas.addtag_all("all")
-        self.myCanvas.addtag_all("pieces")    
+                            self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteKing, tag=("wK","pieces"))        
+        self.myCanvas.addtag_all("all")  
 
