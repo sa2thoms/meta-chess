@@ -70,6 +70,7 @@ class ChessBoard:
     def mapPieces(self):
 
         M = self.M
+        self.myCanvas.delete("pieces")
         for i in range(self.SQUARES):
             for j in range(self.SQUARES):
                 thisPiece = self.myGame.getPiece(Square(i,j))
@@ -100,5 +101,6 @@ class ChessBoard:
                             self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteQueen, tag="bQ")
                         if (thisPiece.symbol == 'Ki'):
                             self.myCanvas.create_image(i*M+M/2, j*M+M/2, image = self.whiteKing, tag="bK")        
-        self.myCanvas.addtag_all("all")    
+        self.myCanvas.addtag_all("all")
+        self.myCanvas.addtag_all("pieces")    
 
