@@ -3,6 +3,7 @@ from pieces.Piece import Piece
 from Square import Square
 from pieceImages import pieceImages
 from color import squareColors
+from Ai import Ai
 
 class ResizingCanvas(Canvas):
     def __init__(self,parent,**kwargs):
@@ -66,6 +67,12 @@ class ChessBoard:
 
         self.myCanvas.addtag_all("all")
 
+        self.myCanvas.bind('<Button-1>', self.aiMakeMove)
+
+    def aiMakeMove(self, event):
+        ai = Ai(3)
+        print(self.myGame.move(ai.bestMove(self.myGame)))
+        self.mapPieces()
 
     def mapPieces(self):
 
