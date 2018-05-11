@@ -36,9 +36,9 @@ class Ai:
         complexity = game.remainingComplexity()
         depth = strength
 
-        if complexity < 16.0:
+        if complexity < 35.0:
             depth += 1
-        if complexity < 8.0:
+        if complexity < 16.0:
             depth += 2
 
         bestScoreEver = 10000000000.0
