@@ -14,7 +14,7 @@ class Piece:
 
     def isAttacking(self, square, game):
         assert isinstance(square, Square)
-        if self.taken:
+        if self.taken or square == self.position:
             return False
         else:
             return self.movementRule.isAttacking(Move(self.position, square), game)
