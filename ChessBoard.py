@@ -4,6 +4,7 @@ from Square import Square
 from pieceImages import pieceImages
 from color import squareColors
 from Ai import Ai
+from MoveRecord import MoveRecord
 
 class ResizingCanvas(Canvas):
     def __init__(self,parent,**kwargs):
@@ -26,25 +27,27 @@ class ChessBoard:
 
     SQUARES = 8
     RATIO = 1/SQUARES
-    CANVAS_SIZE = 800
+    CANVAS_SIZE = 640
     M = RATIO*CANVAS_SIZE
+    RANKS = ['A','B','C','D','E','F','G','H']
 
     def __init__(self, master, myGame):
 
         self.master = master
         self.myGame = myGame
         self.colours = squareColors.SQUARE_COLORS
+        self.hColours = squareColors.SQUARE_HIGHLIGHTS
 
     def printSquares(self):
 
-        M = self.M
+        M = ChessBoard.M
 
         self.myframe = Frame(self.master)
         self.myframe.pack(fill=BOTH, expand=YES)
 
         self.myCanvas = ResizingCanvas(self.myframe, 
-                        width=self.CANVAS_SIZE, 
-                        height=self.CANVAS_SIZE, highlightthickness=0)
+                        width=ChessBoard.CANVAS_SIZE, 
+                        height=ChessBoard.CANVAS_SIZE, highlightthickness=0)
         self.myCanvas.pack(fill=BOTH, expand=YES)
 
         self.blackKing = PhotoImage(file = pieceImages.bKImage)
@@ -60,28 +63,58 @@ class ChessBoard:
         self.whiteRook = PhotoImage(file = pieceImages.wRImage)
         self.whitePawn = PhotoImage(file = pieceImages.wPImage)
 
-        for i in range(self.SQUARES):
-            for j in range(self.SQUARES):
+
+        for i in range(ChessBoard.SQUARES):
+            for j in range(ChessBoard.SQUARES):
+                label = ChessBoard.RANKS[i]+str(j+1)
                 fillchoice = self.colours[(i+j)%2]
-                self.myCanvas.create_rectangle(i*M, j*M,(i+1)*M,(j+1)*M, fill=fillchoice, tag="squares")
+                self.myCanvas.create_rectangle(i*M, j*M,(i+1)*M,(j+1)*M, fill=fillchoice, tag=label)
 
         self.myCanvas.addtag_all("all")
+        self.myCanvas.itemconfig("B6",fill = self.hColours[0])
 
         self.myCanvas.bind('<Button-1>', self.aiMakeMove)
+
 
     def aiMakeMove(self, event):
         ai = Ai(3)
         print(self.myGame.move(ai.bestMove(self.myGame)))
         self.mapPieces()
 
+
     def mapPieces(self):
 
-        self.myCanvas.delete("pieces")
+        M = ChessBoard.M
+
+        #return to original square colours
+        for i in range(ChessBoard.SQUARES):
+            for j in range(ChessBoard.SQUARES):
+                label = ChessBoard.RANKS[i]+str(j+1)
+                fillchoice = self.colours[(i+j)%2]
+                self.myCanvas.itemconfig(label, fill = fillchoice)
+
+        #highlight move squares from most recent move
+        if (len(self.myGame.moveHistory) == 0):
+            print("no moves made")
+        else:
+            thisMoveRecord = self.myGame.moveHistory[len(self.myGame.moveHistory)-1]
+            start = thisMoveRecord.move.start
+            end = thisMoveRecord.move.end
+            print("from ", start, " to ", end)
+            for i in range(ChessBoard.SQUARES):
+                for j in range(ChessBoard.SQUARES):
+                    label = ChessBoard.RANKS[i]+str(j+1)
+                    fillchoice = self.colours[(i+j)%2]
+                    if ((label == str(start)) or (label == str(end))):
+                        fillchoice = self.hColours[(i+j)%2]
+                    self.myCanvas.itemconfig(label, fill = fillchoice)
         
-        M = self.M
+        #delete pieces
         self.myCanvas.delete("pieces")
-        for i in range(self.SQUARES):
-            for j in range(self.SQUARES):
+
+        #remap pieces based on current game state
+        for i in range(ChessBoard.SQUARES):
+            for j in range(ChessBoard.SQUARES):
                 thisPiece = self.myGame.getPiece(Square(i,j))
                 if (thisPiece):
                     if (thisPiece.color == 0):
