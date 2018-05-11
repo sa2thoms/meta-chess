@@ -143,3 +143,21 @@ def test_that_pawn_promotes_to_queen():
     game.move('B5 to B4')
     assert game.move('G7 to F8') == 'check'
     assert isinstance(game.getPiece(Square(5, 7)), Queen)
+
+def test_that_black_pawn_promotes():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('H2 to H4')
+    game.move('A7 to A5')
+    game.move('H4 to H5')
+    game.move('A5 to A4')
+    game.move('H5 to H6')
+    game.move('A4 to A3')
+    game.move('G2 to G3')
+    game.move('A3 to B2')
+    game.move('G3 to G4')
+    assert game.move('B2 to C1') == 'success'
+    assert isinstance(game.getPiece(Square(2, 0)), Queen)
