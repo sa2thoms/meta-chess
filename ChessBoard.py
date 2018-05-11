@@ -29,7 +29,7 @@ class ChessBoard:
     RATIO = 1/SQUARES
     CANVAS_SIZE = 640
     M = RATIO*CANVAS_SIZE
-    RANKS = ['A','B','C','D','E','F','G','H']
+    FILES = ['A','B','C','D','E','F','G','H']
 
     def __init__(self, master, myGame):
 
@@ -66,7 +66,7 @@ class ChessBoard:
 
         for i in range(ChessBoard.SQUARES):
             for j in range(ChessBoard.SQUARES):
-                label = ChessBoard.RANKS[i]+str(8-j)
+                label = ChessBoard.FILES[i]+str(8-j)
                 fillchoice = self.colours[(i+j)%2]
                 self.myCanvas.create_rectangle(i*M, (j)*M,(i+1)*M,(j+1)*M, fill=fillchoice, tag=label)
 
@@ -89,7 +89,7 @@ class ChessBoard:
         #return to original square colours
         for i in range(ChessBoard.SQUARES):
             for j in range(ChessBoard.SQUARES):
-                label = ChessBoard.RANKS[i]+str(8-j)
+                label = ChessBoard.FILES[i]+str(8-j)
                 fillchoice = self.colours[(i+j)%2]
                 self.myCanvas.itemconfig(label, fill = fillchoice)
 
