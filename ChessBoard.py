@@ -71,7 +71,6 @@ class ChessBoard:
                 self.myCanvas.create_rectangle(i*M, (j)*M,(i+1)*M,(j+1)*M, fill=fillchoice, tag=label)
 
         self.myCanvas.addtag_all("all")
-        self.myCanvas.itemconfig("B6",fill = self.hColours[0])
 
         self.myCanvas.bind('<Button-1>', self.aiMakeMove)
 
