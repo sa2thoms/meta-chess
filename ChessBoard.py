@@ -68,7 +68,7 @@ class ChessBoard:
             for j in range(ChessBoard.SQUARES):
                 label = ChessBoard.RANKS[i]+str(8-j)
                 fillchoice = self.colours[(i+j)%2]
-                self.myCanvas.create_rectangle(i*M, (7-j)*M,(i+1)*M,(8-j)*M, fill=fillchoice, tag=label)
+                self.myCanvas.create_rectangle(i*M, (j)*M,(i+1)*M,(j+1)*M, fill=fillchoice, tag=label)
 
         self.myCanvas.addtag_all("all")
         self.myCanvas.itemconfig("B6",fill = self.hColours[0])
@@ -100,18 +100,10 @@ class ChessBoard:
             thisMoveRecord = self.myGame.moveHistory[len(self.myGame.moveHistory)-1]
             start = thisMoveRecord.move.start
             end = thisMoveRecord.move.end
-            # #print("from ", start, " to ", end)
-            # for i in range(ChessBoard.SQUARES):
-            #     for j in range(ChessBoard.SQUARES):
-            #         label = ChessBoard.RANKS[i]+str(8-j)
-            #         fillchoice = self.colours[(i+j)%2]
-            #         if ((label == str(start)) or (label == str(end))):
-            #             fillchoice = self.hColours[(i+j)%2]
-            #         self.myCanvas.itemconfig(label, fill = fillchoice)
             startLabel = str(start)
             endLabel = str(end)
-            startFill = self.hColours[(start.file + start.rank)%2]
-            endFill = self.hColours[(end.file + start.file)%2]
+            startFill = self.hColours[(start.file + start.rank+1)%2]
+            endFill = self.hColours[(end.file + end.rank+1)%2]
             self.myCanvas.itemconfig(startLabel, fill = startFill)
             self.myCanvas.itemconfig(endLabel, fill = endFill)
         
