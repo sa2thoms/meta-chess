@@ -100,14 +100,20 @@ class ChessBoard:
             thisMoveRecord = self.myGame.moveHistory[len(self.myGame.moveHistory)-1]
             start = thisMoveRecord.move.start
             end = thisMoveRecord.move.end
-            #print("from ", start, " to ", end)
-            for i in range(ChessBoard.SQUARES):
-                for j in range(ChessBoard.SQUARES):
-                    label = ChessBoard.RANKS[i]+str(8-j)
-                    fillchoice = self.colours[(i+j)%2]
-                    if ((label == str(start)) or (label == str(end))):
-                        fillchoice = self.hColours[(i+j)%2]
-                    self.myCanvas.itemconfig(label, fill = fillchoice)
+            # #print("from ", start, " to ", end)
+            # for i in range(ChessBoard.SQUARES):
+            #     for j in range(ChessBoard.SQUARES):
+            #         label = ChessBoard.RANKS[i]+str(8-j)
+            #         fillchoice = self.colours[(i+j)%2]
+            #         if ((label == str(start)) or (label == str(end))):
+            #             fillchoice = self.hColours[(i+j)%2]
+            #         self.myCanvas.itemconfig(label, fill = fillchoice)
+            startLabel = str(start)
+            endLabel = str(end)
+            startFill = self.hColours[(start.file + start.rank)%2]
+            endFill = self.hColours[(end.file + start.file)%2]
+            self.myCanvas.itemconfig(startLabel, fill = startFill)
+            self.myCanvas.itemconfig(endLabel, fill = endFill)
         
         #delete pieces
         self.myCanvas.delete("pieces")
