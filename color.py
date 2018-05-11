@@ -1,5 +1,7 @@
 WHITE = 0
 BLACK = 1
+class squareColors:
+    SQUARE_COLORS = ("#EADDC5", "#BA893C")
 
 class modchar:
     PINK = '\033[95m'
