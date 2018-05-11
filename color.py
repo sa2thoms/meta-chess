@@ -2,6 +2,7 @@ WHITE = 0
 BLACK = 1
 class squareColors:
     SQUARE_COLORS = ("#EADDC5", "#BA893C")
+    SQUARE_HIGHLIGHTS = ("#F9DA75", "#82631c")
 
 class modchar:
     PINK = '\033[95m'
