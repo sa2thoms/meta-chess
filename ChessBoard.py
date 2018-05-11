@@ -77,7 +77,7 @@ class ChessBoard:
 
     def aiMakeMove(self, event):
         ai = Ai(3)
-        print(self.myGame.move(ai.bestMove(self.myGame)))
+        print(self.myGame.move(ai.variableDepthBestMove(self.myGame, 3)))
         self.mapPieces()
 
 

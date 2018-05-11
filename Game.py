@@ -363,12 +363,6 @@ class Game:
             self.turn = WHITE
     
     def getPiece(self, position):
-        # for piece in self.whitePieces:
-        #     if piece.position == position and piece.taken == False:
-        #         return piece
-        # for piece in self.blackPieces:
-        #     if piece.position == position and piece.taken == False:
-        #         return piece
         return self.gameTable[position.file][position.rank]
 
     def positionDifferential(self):
@@ -383,6 +377,21 @@ class Game:
                 blackTotal += piece.pointValue()
 
         return whiteTotal - blackTotal
+
+    def remainingComplexity(self):
+        total = 0.0
+
+        for piece in self.whitePieces:
+            if isinstance(piece, King):
+                total += 1.5
+            elif not piece.taken:
+                total += piece.pointValue()
+        for piece in self.blackPieces:
+            if isinstance(piece, King):
+                total += 1.5
+            elif not piece.taken:
+                total += piece.pointValue()
+        return total
 
     def allLegalMoves(self):
         def addAttacksToList(listOfMoves, piece):

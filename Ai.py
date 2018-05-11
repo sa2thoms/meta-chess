@@ -32,6 +32,21 @@ class Ai:
     def promotionCallback(self):
         return self.promoteTo
 
+    def variableDepthBestMove(self, game, strength):
+        complexity = game.remainingComplexity()
+        depth = strength
+
+        if complexity < 16.0:
+            depth += 1
+        if complexity < 8.0:
+            depth += 2
+
+        bestScoreEver = 10000000000.0
+        if game.turn == BLACK:
+            bestScoreEver = -10000000000.0
+
+        return self._getBestMoveAtDepth(bestScoreEver, depth, game).move
+
     def bestMove(self, game):
         bestScoreEver = 10000000000.0
         if game.turn == BLACK:
