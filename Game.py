@@ -363,12 +363,6 @@ class Game:
             self.turn = WHITE
     
     def getPiece(self, position):
-        # for piece in self.whitePieces:
-        #     if piece.position == position and piece.taken == False:
-        #         return piece
-        # for piece in self.blackPieces:
-        #     if piece.position == position and piece.taken == False:
-        #         return piece
         return self.gameTable[position.file][position.rank]
 
     def positionDifferential(self):
