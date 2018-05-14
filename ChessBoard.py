@@ -32,7 +32,6 @@ class ChessBoard:
     RATIO = 1/SQUARES
     CANVAS_SIZE = 640
     M = RATIO*CANVAS_SIZE
-    FILES = ['A','B','C','D','E','F','G','H']
 
     def __init__(self, master, myGame):
 
@@ -68,9 +67,9 @@ class ChessBoard:
 
 
         for file in range(ChessBoard.SQUARES):
-            for rank in range(ChessBoard.SQUARES-1, -1, -1):
-                label = str(Square(file, rank))
-                print (file, rank, label)
+            for rank in range(ChessBoard.SQUARES):
+                label = str(Square(file, 7-rank))
+                #print (file, rank, label)
                 fillchoice = self.colours[(file+rank)%2]
                 self.myCanvas.create_rectangle(file*M, rank*M,(file+1)*M,(rank+1)*M, fill=fillchoice, tag=label)
 
@@ -84,17 +83,19 @@ class ChessBoard:
     def aiMakeMove(self, event):
         ai = Ai(3)
         print(self.myGame.move(ai.bestMove(self.myGame)))
-        self.mapPieces()
+        self.reMapPieces()
+
+    #def mapPieces(self):
 
 
-    def mapPieces(self):
+    def reMapPieces(self):
 
         M = ChessBoard.M
 
         #return to original square colours
         for file in range(ChessBoard.SQUARES):
-            for rank in range(ChessBoard.SQUARES-1, -1, -1):
-                label = str(Square(file, rank))
+            for rank in range(ChessBoard.SQUARES):
+                label = str(Square(file, 7-rank))
                 fillchoice = self.colours[(file+rank)%2]
                 self.myCanvas.itemconfig(label, fill = fillchoice)
 
@@ -107,8 +108,8 @@ class ChessBoard:
             end = thisMoveRecord.move.end
             startLabel = str(start)
             endLabel = str(end)
-            startFill = self.hColours[(start.file + start.rank)%2]
-            endFill = self.hColours[(end.file + end.rank)%2]
+            startFill = self.hColours[(start.file + start.rank + 1)%2]
+            endFill = self.hColours[(end.file + end.rank + 1)%2]
             self.myCanvas.itemconfig(startLabel, fill = startFill)
             self.myCanvas.itemconfig(endLabel, fill = endFill)
         
@@ -136,14 +137,13 @@ class ChessBoard:
 
         #remap pieces based on current game state
         for file in range(ChessBoard.SQUARES):
-            for rank in range(ChessBoard.SQUARES-1, -1, -1):
+            for rank in range(ChessBoard.SQUARES):
                 thisPiece = self.myGame.getPiece(Square(file,rank))
                 filePosition = (file*M+M/2)*self.myCanvas.currentScale
-                rankPosition = (rank*M+M/2)*self.myCanvas.currentScale
+                rankPosition = ((7-rank)*M+M/2)*self.myCanvas.currentScale
                 if (thisPiece):
                     if (thisPiece.color == BLACK):
                         if (thisPiece.symbol == 'pa'):
-                            print (filePosition)
                             self.myCanvas.create_image(filePosition, rankPosition, image = self.blackPawn, tag = ("bP","pieces"))
                         if (thisPiece.symbol == 'ro'):
                             self.myCanvas.create_image(filePosition, rankPosition, image = self.blackRook, tag=("bR","pieces"))
