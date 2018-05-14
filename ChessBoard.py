@@ -12,12 +12,15 @@ class ResizingCanvas(Canvas):
         self.bind("<Configure>", self.on_resize)
         self.height = self.winfo_reqheight()
         self.width = self.winfo_reqwidth()
+        self.originalWidth = self.width
+        self.currentScale = self.width/self.originalWidth
 
     def on_resize(self,event):
         # determine the ratio of old width/height to new width/height
         scale = float(event.width)/self.width
         self.width = event.width
         self.height = event.width
+        self.currentScale = self.width/self.originalWidth
         # resize the canvas 
         self.config(width=self.width, height=self.height)
         # rescale all the objects tagged with the "all" tag
@@ -135,32 +138,35 @@ class ChessBoard:
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES-1, -1, -1):
                 thisPiece = self.myGame.getPiece(Square(file,rank))
+                filePosition = (file*M+M/2)*self.myCanvas.currentScale
+                rankPosition = (rank*M+M/2)*self.myCanvas.currentScale
                 if (thisPiece):
                     if (thisPiece.color == BLACK):
                         if (thisPiece.symbol == 'pa'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.blackPawn, tag = ("bP","pieces"))
+                            print (filePosition)
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackPawn, tag = ("bP","pieces"))
                         if (thisPiece.symbol == 'ro'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.blackRook, tag=("bR","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackRook, tag=("bR","pieces"))
                         if (thisPiece.symbol == 'kn'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.blackKnight, tag=("bN","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKnight, tag=("bN","pieces"))
                         if (thisPiece.symbol == 'bi'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.blackBishop, tag=("bB","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackBishop, tag=("bB","pieces"))
                         if (thisPiece.symbol == 'Qu'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.blackQueen, tag=("bQ","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackQueen, tag=("bQ","pieces"))
                         if (thisPiece.symbol == 'Ki'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.blackKing, tag=("bK","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKing, tag=("bK","pieces"))
                     if (thisPiece.color == WHITE):
                         if (thisPiece.symbol == 'pa'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.whitePawn, tag = ("wP","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whitePawn, tag = ("wP","pieces"))
                         if (thisPiece.symbol == 'ro'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.whiteRook, tag=("wR","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteRook, tag=("wR","pieces"))
                         if (thisPiece.symbol == 'kn'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.whiteKnight, tag=("wN","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKnight, tag=("wN","pieces"))
                         if (thisPiece.symbol == 'bi'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.whiteBishop, tag=("wB","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteBishop, tag=("wB","pieces"))
                         if (thisPiece.symbol == 'Qu'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.whiteQueen, tag=("wQ","pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteQueen, tag=("wQ","pieces"))
                         if (thisPiece.symbol == 'Ki'):
-                            self.myCanvas.create_image(file*M+M/2, rank*M+M/2, image = self.whiteKing, tag=("wK","pieces"))        
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKing, tag=("wK","pieces"))        
         self.myCanvas.addtag_all("all")  
 
