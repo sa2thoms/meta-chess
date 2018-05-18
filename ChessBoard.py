@@ -2,6 +2,7 @@ from tkinter import *
 from pieces.Piece import Piece
 from Square import Square
 from pieceImages import pieceImages
+from Move import Move
 from color import squareColors, BLACK, WHITE
 from Ai import Ai
 from MoveRecord import MoveRecord
@@ -84,7 +85,7 @@ class ChessBoard:
         rank = 7-int( event.y / squareSize)
         file = int (event.x / squareSize)
         self.endSquare = Square(file, rank)
-        print(self.myGame.move(self.startSquare, self.endSquare))
+        print(self.myGame.move(Move(self.startSquare, self.endSquare)))
         self.reMapPieces()
 
     def setUpPieces(self):
@@ -129,66 +130,39 @@ class ChessBoard:
         self.myCanvas.delete("pieces")
 
         #remap pieces based on current game state
-        bpIndex = 0
-        brIndex = 0
-        bbIndex = 0
-        bnIndex = 0
-        wpIndex = 0
-        wrIndex = 0
-        wbIndex = 0
-        wnIndex = 0
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES):
                 thisPiece = self.myGame.getPiece(Square(file,rank))
                 filePosition = (file*DIM+DIM/2)*self.myCanvas.currentScale
                 rankPosition = ((7-rank)*DIM+DIM/2)*self.myCanvas.currentScale
+                label = "pieces"
                 if (thisPiece):
                     if (thisPiece.color == BLACK):
                         if (thisPiece.symbol == 'pa'):
-                            label = "bp"+str(bpIndex)
-                            bpIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackPawn, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackPawn, tag = label)
                         if (thisPiece.symbol == 'ro'):
-                            label = "br"+str(brIndex)
-                            brIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackRook, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackRook, tag = label)
                         if (thisPiece.symbol == 'kn'):
-                            label = "bn"+str(bnIndex)
-                            bnIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKnight, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKnight, tag = label)
                         if (thisPiece.symbol == 'bi'):
-                            label = "bb"+str(bbIndex)
-                            bbIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackBishop, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackBishop, tag = label)
                         if (thisPiece.symbol == 'Qu'):
-                            label = "bq"
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackQueen, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackQueen, tag = label)
                         if (thisPiece.symbol == 'Ki'):
-                            label = "bk"
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKing, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKing, tag = label)
                     if (thisPiece.color == WHITE):
                         if (thisPiece.symbol == 'pa'):
-                            label = "wp"+str(wpIndex)
-                            wpIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whitePawn, tag = (label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whitePawn, tag = label)
                         if (thisPiece.symbol == 'ro'):
-                            label = "wr"+str(wrIndex)
-                            wrIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteRook, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteRook, tag = label)
                         if (thisPiece.symbol == 'kn'):
-                            label = "wn"+str(wnIndex)
-                            wnIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKnight, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKnight, tag = label)
                         if (thisPiece.symbol == 'bi'):
-                            label = "wb"+str(wbIndex)
-                            wbIndex += 1
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteBishop, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteBishop, tag = label)
                         if (thisPiece.symbol == 'Qu'):
-                            label = "wq"
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteQueen, tag=(label,"pieces"))
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteQueen, tag = label)
                         if (thisPiece.symbol == 'Ki'):
-                            label = "wk"
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKing, tag=(label,"pieces"))        
+                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKing, tag = label)        
                 self.myCanvas.tag_bind(label, '<Button-1>', self.playerStartMove)
                 self.myCanvas.tag_bind(label, '<B1-Motion>', self.playerDraggingMove)
                 self.myCanvas.tag_bind(label, '<ButtonRelease-1>', self.playerMakeMove)
