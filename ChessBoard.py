@@ -31,11 +31,11 @@ class ResizingCanvas(Canvas):
 class ChessBoard:
 
     SQUARES = 8
-    CANVAS_SIZE = 640
-    DIM = CANVAS_SIZE/SQUARES
-    AI_OVER = 0.2 #percentage of chessboard
-    AI_DOWN = 0.02 #percentage of chessboard
-    ASPECT_RATIO = (CANVAS_SIZE*(1+(2*AI_DOWN))+DIM/2)/CANVAS_SIZE
+    BOARD_SIZE = 640
+    DIM = BOARD_SIZE/SQUARES
+    BUTTON_SPACER = 0.2 #percentage of chessboard
+    BOARD_SPACER = 0.02 #percentage of chessboard
+    ASPECT_RATIO = (BOARD_SIZE + 2*BOARD_SPACER*BOARD_SIZE + DIM/2 )/BOARD_SIZE
 
     def __init__(self, master, myGame):
         self.master = master
@@ -45,21 +45,42 @@ class ChessBoard:
 
     def printSquares(self):
         DIM = ChessBoard.DIM
-        width = ChessBoard.CANVAS_SIZE
-        height = ChessBoard.CANVAS_SIZE * ChessBoard.ASPECT_RATIO
+        boardSpacer = ChessBoard.BOARD_SPACER*ChessBoard.BOARD_SIZE
+        width = ChessBoard.BOARD_SIZE + 2*boardSpacer
+        height = ChessBoard.BOARD_SIZE * ChessBoard.ASPECT_RATIO
+        files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         self.myCanvas = ResizingCanvas(self.master, width=width, 
                         height=height, highlightthickness=0)
         self.myCanvas.pack(fill=BOTH, expand=YES)
+        #print file labels
+        xloc = boardSpacer + DIM/2
+        yloc = boardSpacer/2
+        for file in range(ChessBoard.SQUARES):
+            self.myCanvas.create_text(xloc + file*DIM, yloc, text = files[file], font = ("Courier", 12))
+        yloc = 3*boardSpacer/2 + ChessBoard.BOARD_SIZE
+        for file in range(ChessBoard.SQUARES):
+            self.myCanvas.create_text(xloc + file*DIM, yloc, text = files[file], font = ("Courier", 12))
+        #print rank labels
+        xloc = boardSpacer/2
+        yloc = boardSpacer + DIM/2
+        for rank in range(ChessBoard.SQUARES):
+            self.myCanvas.create_text(xloc, yloc+(7-rank)*DIM, text = str(rank+1), font = ("Courier", 12))
+        xloc = 3*boardSpacer/2 + ChessBoard.BOARD_SIZE
+        for rank in range(ChessBoard.SQUARES):
+            self.myCanvas.create_text(xloc, yloc+(7-rank)*DIM, text = str(rank+1), font = ("Courier", 12))
+        #print squares
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES):
                 label = str(Square(file, rank))
                 fillchoice = self.colours[(file+rank+1)%2]
-                self.myCanvas.create_rectangle(file*DIM, (7-rank)*DIM,(file+1)*DIM,(8-rank)*DIM, fill=fillchoice, tag=label)
-        xloc = ChessBoard.CANVAS_SIZE*ChessBoard.AI_OVER
-        yloc = ChessBoard.CANVAS_SIZE*(1+ChessBoard.AI_DOWN)
+                xloc = file*DIM + boardSpacer
+                yloc = (7-rank)*DIM + boardSpacer
+                self.myCanvas.create_rectangle(xloc, yloc, xloc+DIM, yloc+DIM, fill=fillchoice, tag=label)
+        xloc = ChessBoard.BOARD_SIZE * ChessBoard.BUTTON_SPACER + boardSpacer
+        yloc = ChessBoard.BOARD_SIZE + 3*boardSpacer
         self.aiButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, fill = self.colours[1], tag = "aiTurn")
         self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "AI's turn", font = ("Courier", 12), tag = "aiTurn")
-        xloc = ChessBoard.CANVAS_SIZE*(1 - ChessBoard.AI_OVER) - 2*DIM
+        xloc = ChessBoard.BOARD_SIZE*(1 - ChessBoard.BUTTON_SPACER) - 2*DIM + boardSpacer
         self.undoButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, fill = self.colours[1], tag = "undo")
         self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "undo", font = ("Courier", 12), tag = "undo")
         self.myCanvas.addtag_all("all")
@@ -79,7 +100,7 @@ class ChessBoard:
         self.currentX = event.x
         self.currentY = event.y
         self.dragItem = self.myCanvas.find_closest(event.x, event.y)[0]
-        squareSize = self.myCanvas.currentScale*ChessBoard.CANVAS_SIZE/ChessBoard.SQUARES
+        squareSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE/ChessBoard.SQUARES
         rank = 7-int( event.y / squareSize)
         file = int (event.x / squareSize)
         self.startSquare = Square(file, rank)
@@ -90,7 +111,7 @@ class ChessBoard:
         self.currentY = event.y
         
     def playerMakeMove(self, event):
-        squareSize = self.myCanvas.currentScale*ChessBoard.CANVAS_SIZE/ChessBoard.SQUARES
+        squareSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE/ChessBoard.SQUARES
         rank = 7-int( event.y / squareSize)
         file = int (event.x / squareSize)
         self.endSquare = Square(file, rank)
@@ -117,6 +138,7 @@ class ChessBoard:
 
     def reMapPieces(self):
         DIM = ChessBoard.DIM
+        boardSpacer = ChessBoard.BOARD_SPACER*ChessBoard.BOARD_SIZE
         #return to original square colours
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES):
@@ -145,8 +167,8 @@ class ChessBoard:
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES):
                 thisPiece = self.myGame.getPiece(Square(file,rank))
-                filePosition = (file*DIM+DIM/2)*self.myCanvas.currentScale
-                rankPosition = ((7-rank)*DIM+DIM/2)*self.myCanvas.currentScale
+                filePosition = boardSpacer+(file*DIM+DIM/2)*self.myCanvas.currentScale
+                rankPosition = boardSpacer+((7-rank)*DIM+DIM/2)*self.myCanvas.currentScale
                 label = "pieces"
                 if (thisPiece):
                     if (thisPiece.color == BLACK):
