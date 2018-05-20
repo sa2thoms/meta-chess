@@ -6,6 +6,7 @@ from Move import Move
 from color import squareColors, BLACK, WHITE
 from Ai import Ai
 from MoveRecord import MoveRecord
+from IllegalMoveException import IllegalMoveException
 
 class ResizingCanvas(Canvas):
     def __init__(self,parent,**kwargs):
@@ -58,12 +59,20 @@ class ChessBoard:
         yloc = ChessBoard.CANVAS_SIZE*(1+ChessBoard.AI_DOWN)
         self.aiButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, fill = self.colours[1], tag = "aiTurn")
         self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "AI's turn", font = ("Courier", 12), tag = "aiTurn")
+        xloc = ChessBoard.CANVAS_SIZE*(1 - ChessBoard.AI_OVER) - 2*DIM
+        self.undoButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, fill = self.colours[1], tag = "undo")
+        self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "undo", font = ("Courier", 12), tag = "undo")
         self.myCanvas.addtag_all("all")
         self.myCanvas.tag_bind("aiTurn", '<Button-1>', self.aiMakeMove)
+        self.myCanvas.tag_bind("undo", '<Button-1>', self.undoLastMove)
 
     def aiMakeMove(self, event):
         ai = Ai(3)
         print(self.myGame.move(ai.bestMove(self.myGame)))
+        self.reMapPieces()
+
+    def undoLastMove(self, event):
+        print(self.myGame.undoLastMove())
         self.reMapPieces()
 
     def playerStartMove(self, event):
@@ -85,7 +94,10 @@ class ChessBoard:
         rank = 7-int( event.y / squareSize)
         file = int (event.x / squareSize)
         self.endSquare = Square(file, rank)
-        print(self.myGame.move(Move(self.startSquare, self.endSquare)))
+        try:
+            print(self.myGame.move(Move(self.startSquare, self.endSquare)))
+        except IllegalMoveException as e:
+            print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
         self.reMapPieces()
 
     def setUpPieces(self):
