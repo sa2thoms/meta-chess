@@ -115,10 +115,11 @@ class ChessBoard:
         rank = 7-int( event.y / squareSize)
         file = int (event.x / squareSize)
         self.endSquare = Square(file, rank)
-        try:
-            print(self.myGame.move(Move(self.startSquare, self.endSquare)))
-        except IllegalMoveException as e:
-            print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
+        if self.endSquare != self.startSquare:
+            try:
+                print(self.myGame.move(Move(self.startSquare, self.endSquare)))
+            except IllegalMoveException as e:
+                print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
         self.reMapPieces()
 
     def setUpPieces(self):
