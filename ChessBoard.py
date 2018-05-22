@@ -52,22 +52,27 @@ class ChessBoard:
         self.myCanvas = ResizingCanvas(self.master, width=width, 
                         height=height, highlightthickness=0)
         self.myCanvas.pack(fill=BOTH, expand=YES)
+        self.myCanvas.tagException = False
         #print file labels
         xloc = boardSpacer + DIM/2
         yloc = boardSpacer/2
         for file in range(ChessBoard.SQUARES):
-            self.myCanvas.create_text(xloc + file*DIM, yloc, text = files[file], font = ("Courier", 12))
+            self.myCanvas.create_text(xloc + file*DIM, yloc, text = files[file], 
+                font = ("Courier", 12))
         yloc = 3*boardSpacer/2 + ChessBoard.BOARD_SIZE
         for file in range(ChessBoard.SQUARES):
-            self.myCanvas.create_text(xloc + file*DIM, yloc, text = files[file], font = ("Courier", 12))
+            self.myCanvas.create_text(xloc + file*DIM, yloc, text = files[file], 
+                font = ("Courier", 12))
         #print rank labels
         xloc = boardSpacer/2
         yloc = boardSpacer + DIM/2
         for rank in range(ChessBoard.SQUARES):
-            self.myCanvas.create_text(xloc, yloc+(7-rank)*DIM, text = str(rank+1), font = ("Courier", 12))
+            self.myCanvas.create_text(xloc, yloc+(7-rank)*DIM, text = str(rank+1), 
+                font = ("Courier", 12))
         xloc = 3*boardSpacer/2 + ChessBoard.BOARD_SIZE
         for rank in range(ChessBoard.SQUARES):
-            self.myCanvas.create_text(xloc, yloc+(7-rank)*DIM, text = str(rank+1), font = ("Courier", 12))
+            self.myCanvas.create_text(xloc, yloc+(7-rank)*DIM, text = str(rank+1), 
+                font = ("Courier", 12))
         #print squares
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES):
@@ -75,52 +80,81 @@ class ChessBoard:
                 fillchoice = self.colours[(file+rank+1)%2]
                 xloc = file*DIM + boardSpacer
                 yloc = (7-rank)*DIM + boardSpacer
-                self.myCanvas.create_rectangle(xloc, yloc, xloc+DIM, yloc+DIM, fill=fillchoice, tag=label)
+                self.myCanvas.create_rectangle(xloc, yloc, xloc+DIM, yloc+DIM, fill=fillchoice, 
+                    tag=label)
+        #print buttons
         xloc = ChessBoard.BOARD_SIZE * ChessBoard.BUTTON_SPACER + boardSpacer
         yloc = ChessBoard.BOARD_SIZE + 3*boardSpacer
-        self.aiButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, fill = self.colours[1], tag = "aiTurn")
-        self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "AI's turn", font = ("Courier", 12), tag = "aiTurn")
+        self.aiButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, 
+            fill = self.colours[1], tag = "aiTurn")
+        self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "AI's turn", font = ("Courier", 12), 
+            tag = "aiTurn")
         xloc = ChessBoard.BOARD_SIZE*(1 - ChessBoard.BUTTON_SPACER) - 2*DIM + boardSpacer
-        self.undoButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, fill = self.colours[1], tag = "undo")
-        self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "undo", font = ("Courier", 12), tag = "undo")
+        self.undoButton = self.myCanvas.create_rectangle(xloc, yloc, xloc+2*DIM, yloc+DIM/2, 
+            fill = self.colours[1], tag = "undo")
+        self.myCanvas.create_text(xloc+DIM, yloc+DIM/4, text = "undo", font = ("Courier", 12), 
+            tag = "undo")
         self.myCanvas.addtag_all("all")
         self.myCanvas.tag_bind("aiTurn", '<Button-1>', self.aiMakeMove)
         self.myCanvas.tag_bind("undo", '<Button-1>', self.undoLastMove)
 
     def aiMakeMove(self, event):
-        ai = Ai(3)
-        print(self.myGame.move(ai.bestMove(self.myGame)))
-        self.reMapPieces()
+        if self.myCanvas.tagException == False:
+            ai = Ai(3)
+            print(self.myGame.move(ai.bestMove(self.myGame)))
+            self.reMapPieces()
 
     def undoLastMove(self, event):
-        print(self.myGame.undoLastMove())
-        self.reMapPieces()
+        if self.myCanvas.tagException == False:
+            print(self.myGame.undoLastMove())
+            self.reMapPieces()
 
     def playerStartMove(self, event):
-        self.currentX = event.x
-        self.currentY = event.y
-        self.dragItem = self.myCanvas.find_closest(event.x, event.y)[0]
-        squareSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE/ChessBoard.SQUARES
-        rank = 7-int( event.y / squareSize)
-        file = int (event.x / squareSize)
-        self.startSquare = Square(file, rank)
+        if self.myCanvas.tagException == False:
+            self.currentX = event.x
+            self.currentY = event.y
+            self.dragItem = self.myCanvas.find_closest(event.x, event.y)[0]
+            squareSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE/ChessBoard.SQUARES
+            rank = 7-int( event.y / squareSize)
+            file = int (event.x / squareSize)
+            self.startSquare = Square(file, rank)
 
     def playerDraggingMove(self, event):
-        self.myCanvas.move(self.dragItem,event.x-self.currentX, event.y-self.currentY)
-        self.currentX = event.x
-        self.currentY = event.y
+        if self.myCanvas.tagException == False:
+            self.myCanvas.move(self.dragItem,event.x-self.currentX, event.y-self.currentY)
+            self.currentX = event.x
+            self.currentY = event.y
         
     def playerMakeMove(self, event):
-        squareSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE/ChessBoard.SQUARES
-        rank = 7-int( event.y / squareSize)
-        file = int (event.x / squareSize)
-        self.endSquare = Square(file, rank)
-        if self.endSquare != self.startSquare:
-            try:
-                print(self.myGame.move(Move(self.startSquare, self.endSquare)))
-            except IllegalMoveException as e:
-                print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
-        self.reMapPieces()
+        if self.myCanvas.tagException == False:
+            boardSpacer = ChessBoard.BOARD_SIZE*ChessBoard.BOARD_SPACER
+            boardSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE*(1+2*ChessBoard.BOARD_SPACER)
+            squareSize = boardSize/ChessBoard.SQUARES
+            xloc = 1.5*squareSize
+            yloc = 3.5*squareSize
+            rank = 7-int( event.y / squareSize)
+            file = int (event.x / squareSize)
+            self.endSquare = Square(file, rank)
+            if self.endSquare != self.startSquare:
+                try:
+                    print(self.myGame.move(Move(self.startSquare, self.endSquare)))
+                except IllegalMoveException as e:
+                    self.myCanvas.create_rectangle(xloc, yloc, boardSize-xloc, boardSize - yloc, 
+                        fill = self.colours[1], width = 5, tag = "exception")
+                    self.myCanvas.create_text(boardSize/2, boardSize/2-2*boardSpacer, 
+                        text = str(e) + ", try again", 
+                        font = ("Courier", 12), tag = "exception")
+                    self.myCanvas.create_text(boardSize/2, boardSize/2+2*boardSpacer, 
+                        text = "click to dismiss", 
+                        font = ("Courier", 12), tag = "exception")
+                    self.myCanvas.tag_bind("exception", '<Button-1>', self.removePopUp)
+                    self.myCanvas.tagException = True
+                    print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
+            self.reMapPieces()
+
+    def removePopUp(self, event):
+        self.myCanvas.tagException = False
+        self.myCanvas.delete("exception")
 
     def setUpPieces(self):
         DIM = ChessBoard.DIM
@@ -165,41 +199,59 @@ class ChessBoard:
         self.myCanvas.delete("pieces")
 
         #remap pieces based on current game state
+        fileNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         for file in range(ChessBoard.SQUARES):
             for rank in range(ChessBoard.SQUARES):
                 thisPiece = self.myGame.getPiece(Square(file,rank))
                 filePosition = boardSpacer+(file*DIM+DIM/2)*self.myCanvas.currentScale
                 rankPosition = boardSpacer+((7-rank)*DIM+DIM/2)*self.myCanvas.currentScale
-                label = "pieces"
                 if (thisPiece):
+                    label = 'piece'+fileNames[file]+str(rank+1)
                     if (thisPiece.color == BLACK):
                         if (thisPiece.symbol == 'pa'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackPawn, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.blackPawn, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'ro'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackRook, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.blackRook, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'kn'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKnight, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.blackKnight, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'bi'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackBishop, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.blackBishop, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'Qu'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackQueen, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.blackQueen, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'Ki'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.blackKing, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.blackKing, tag = (label, "pieces"))
                     if (thisPiece.color == WHITE):
                         if (thisPiece.symbol == 'pa'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whitePawn, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.whitePawn, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'ro'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteRook, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.whiteRook, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'kn'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKnight, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.whiteKnight, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'bi'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteBishop, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.whiteBishop, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'Qu'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteQueen, tag = label)
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.whiteQueen, tag = (label, "pieces"))
                         if (thisPiece.symbol == 'Ki'):
-                            self.myCanvas.create_image(filePosition, rankPosition, image = self.whiteKing, tag = label)        
+                            self.myCanvas.create_image(filePosition, rankPosition, 
+                                            image = self.whiteKing, tag = (label, "pieces"))        
                 self.myCanvas.tag_bind(label, '<Button-1>', self.playerStartMove)
                 self.myCanvas.tag_bind(label, '<B1-Motion>', self.playerDraggingMove)
                 self.myCanvas.tag_bind(label, '<ButtonRelease-1>', self.playerMakeMove)
-        self.myCanvas.addtag_all("all")  
+        self.myCanvas.addtag_all("all")
+        lowerList = ['pieceB4', 'pieceC4', 'pieceD4', 'pieceE4', 'pieceF4', 'pieceG4', 
+                    'pieceB5', 'pieceC5', 'pieceD5', 'pieceE5', 'pieceF5', 'pieceG5']
+        for item in lowerList:
+            if bool(self.myCanvas.find_withtag(item)):
+                self.myCanvas.tag_raise("exception",item)  
 
