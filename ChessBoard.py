@@ -101,7 +101,10 @@ class ChessBoard:
     def aiMakeMove(self, event):
         if self.myCanvas.tagException == False:
             ai = Ai(3)
-            print(self.myGame.move(ai.bestMove(self.myGame)))
+            message = self.myGame.move(ai.bestMove(self.myGame))
+            print(message)
+            if message == "check":
+                self.gameStateWindow(message)
             self.reMapPieces()
 
     def undoLastMove(self, event):
@@ -137,7 +140,10 @@ class ChessBoard:
             self.endSquare = Square(file, rank)
             if self.endSquare != self.startSquare:
                 try:
-                    print(self.myGame.move(Move(self.startSquare, self.endSquare)))
+                    message = self.myGame.move(Move(self.startSquare, self.endSquare))
+                    print(message)
+                    if message == 'check':
+                        self.gameStateWindow(message)
                 except IllegalMoveException as e:
                     self.myCanvas.create_rectangle(xloc, yloc, boardSize-xloc, boardSize - yloc, 
                         fill = self.colours[1], width = 5, tag = "exception")
@@ -147,14 +153,35 @@ class ChessBoard:
                     self.myCanvas.create_text(boardSize/2, boardSize/2+2*boardSpacer, 
                         text = "click to dismiss", 
                         font = ("Courier", 12), tag = "exception")
-                    self.myCanvas.tag_bind("exception", '<Button-1>', self.removePopUp)
+                    popUpTag = "exception"
+                    self.myCanvas.tag_bind(popUpTag, '<Button-1>', 
+                        lambda event: self.removePopUp(event,popUpTag))
                     self.myCanvas.tagException = True
                     print('\nThat move is not legal: ' + str(e) + '. Try again: ', end="")
             self.reMapPieces()
 
-    def removePopUp(self, event):
+    def gameStateWindow(self, message):
+        boardSpacer = ChessBoard.BOARD_SIZE*ChessBoard.BOARD_SPACER
+        boardSize = self.myCanvas.currentScale*ChessBoard.BOARD_SIZE*(1+2*ChessBoard.BOARD_SPACER)
+        squareSize = boardSize/ChessBoard.SQUARES
+        xloc = 2.5*squareSize
+        yloc = 3.5*squareSize
+        self.myCanvas.create_rectangle(xloc, yloc, boardSize-xloc, boardSize - yloc, 
+                        fill = self.colours[1], width = 5, tag = "game_state")
+        self.myCanvas.create_text(boardSize/2, boardSize/2-boardSpacer, 
+                        text = message +'!', 
+                        font = ("Courier", 16), tag = "game_state")
+        self.myCanvas.create_text(boardSize/2, boardSize/2+2*boardSpacer, 
+                        text = "click to dismiss", 
+                        font = ("Courier", 12), tag = "game_state")
+        popUpTag = "game_state"
+        self.myCanvas.tag_bind(popUpTag, '<Button-1>', 
+            lambda event: self.removePopUp(event, popUpTag))
+        self.myCanvas.tagException = True
+
+    def removePopUp(self, event, tag):
         self.myCanvas.tagException = False
-        self.myCanvas.delete("exception")
+        self.myCanvas.delete(tag)
 
     def setUpPieces(self):
         DIM = ChessBoard.DIM
@@ -253,5 +280,6 @@ class ChessBoard:
                     'pieceB5', 'pieceC5', 'pieceD5', 'pieceE5', 'pieceF5', 'pieceG5']
         for item in lowerList:
             if bool(self.myCanvas.find_withtag(item)):
-                self.myCanvas.tag_raise("exception",item)  
+                self.myCanvas.tag_raise("exception",item)
+                self.myCanvas.tag_raise("game_state",item) 
 
