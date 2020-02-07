@@ -6,11 +6,17 @@ from Square import Square
 from Move import Move
 
 import random
+import threading
+
+def singleThreadBestMove(game, searchDepth):
+    ai = Ai(searchDepth, 1)
+    return ai.bestMove(game)
 
 class Ai:
 
-    def __init__(self, searchDepth):
+    def __init__(self, searchDepth, thread_count = 1):
         self.searchDepth = searchDepth
+        self.thread_count = thread_count
         self.promoteTo = 'q'
         random.seed()
 
@@ -36,7 +42,24 @@ class Ai:
         bestScoreEver = 10000000000.0
         if game.turn == BLACK:
             bestScoreEver = -10000000000.0
-        return self._getBestMoveAtDepth(bestScoreEver, self.searchDepth, game).move
+        if (self.thread_count == 1):
+            return self._getBestMoveAtDepth(bestScoreEver, self.searchDepth, game).move
+        else:
+            return Ai._bestMoveUsingThreads(bestScoreEver, self.searchDepth, game, self.thread_count)
+
+    def _bestMoveUsingThreads(bestScoreSoFar, depth, game, n_threads):
+        moves = list(game.allLegalMoves())
+        move_assignments = []
+        for i in range(0, n_threads):
+            move_assignments.push([])
+        for i in range(0, len(moves)):
+            assignee = i % n_threads
+            move_assignments[assignee].push(moves[i])
+        threads = []
+        for i in range(0, n_threads):
+            game_copy = game.fullCopy()
+            thread = threading.Thread(target=singleThreadBestMove, args=(game_copy, self.searchDepth - 1))
+            threads.push()
 
     class BestCaseMove:
         def __init__(self, move, differential):

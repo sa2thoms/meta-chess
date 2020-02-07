@@ -1,5 +1,6 @@
 from tkinter import *
 import NormalChessConfig
+import SimonsChessConfig
 from Game import Game
 from ChessBoard import ChessBoard
 

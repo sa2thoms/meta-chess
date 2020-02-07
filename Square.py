@@ -9,6 +9,9 @@ class Square:
         self.file = file
         self.rank = rank
 
+    def fullCopy(self):
+        return Square(self.file, self.rank)
+
     def __eq__(self, other):
         return self.file == other.file and self.rank == other.rank
         

@@ -14,3 +14,15 @@ class MoveRecord:
         self.pieceTaken = pieceTaken
         self.piecePromotedTo = piecePromotedTo
         self.castleMove = castleMove
+    
+    def fullCopy(self, piece_map):
+        # note that piece_map must be a dictionary mapping the old pieces to the new pieces
+        new_pieceInMotion = piece_map[pieceInMotion]
+        new_pieceTaken = None if not (self.pieceTaken in piece_map) else piece_map[self.pieceTaken]
+        new_piecePromotedTo = None if not (self.piecePromotedTo in piece_map) else piece_map[self.piecePromotedTo]
+        
+        new_castleMove = None
+        if self.castleMove:
+            new_castleMove = self.castleMove.fullCopy(piece_map)
+
+        return MoveRecord(self.move.fullCopy(), new_pieceInMotion, new_pieceTaken, new_piecePromotedTo, new_castleMove)

@@ -39,6 +39,24 @@ class Game:
         with open(BOARD_FILE, 'r') as boardFile:
             self.boardTemplate = boardFile.read()
 
+    def fullCopy(self):
+        game_copy = Game(self.ruleSet, self.promotionCallback)
+        game_copy.whitePieces = [piece.fullCopy() for piece in self.whitePieces]
+        game_copy.blackPieces = [piece.fullCopy() for piece in self.blackPieces]
+        piece_map = {}
+        for i in range(0, len(self.whitePieces)):
+            piece_map[self.whitePieces[i]] = game_copy.whitePieces[i]
+        for i in range(0, len(self.blackPieces)):
+            piece_map[self.blackPieces[i]] = game_copy.blackPieces[i]
+        game_copy.gameTable = [[None for i in range(0, 8)] for j in range(0, 8)]
+        for piece in game_copy.whitePieces + game_copy.blackPieces:
+            if (not piece.taken):
+                game_copy.gameTable[piece.position.file][piece.position.rank] = piece
+        game_copy.turn = self.turn
+        game_copy.moveHistory = [record.fullCopy(piece_map) for record in self.moveHistory]
+        game_copy.boardTemplate = self.boardTemplate
+        return game_copy
+
     def isLoaded(self):
         return len(self.whitePieces) > 0 or len(self.blackPieces) > 0
 

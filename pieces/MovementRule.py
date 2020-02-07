@@ -11,6 +11,9 @@ class MovementRule:
 
         self._pointValue = self._calculatePointValue()
 
+    def fullCopy(self):
+        return MovementRule(self.allowsVerticalCartesian, self.allowsHorizontalCartesian, self.allowsDiagonal, self.jumpRules)
+
     def _moveConformsToJumpRules(self, move):
         for jumpRule in self.jumpRules:
             if (jumpRule[0] == abs(move.end.file - move.start.file) and jumpRule[1] == abs(move.end.rank - move.start.rank)):
