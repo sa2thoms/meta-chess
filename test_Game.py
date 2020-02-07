@@ -250,3 +250,39 @@ def test_that_positionDifferential_returns_zero_at_start():
     game.load()
     assert game.positionDifferential() == 0.0
     
+def test_that_copying_a_game_has_the_correct_pieces():
+    ruleSet = NormalChessConfig.ruleSet
+    def promotionCallback():
+        return 'q'
+    game = Game(ruleSet, promotionCallback)
+    game.load()
+    game.move('D2 to D4')
+    game.move('E7 to E5')
+    game.move('D4 to E5')
+    game.move('A7 to A5')
+    game.move('E5 to E6')
+    game.move('A5 to A4')
+    game_copy = game.fullCopy()
+    for file, file_group in enumerate(game.gameTable):
+        for rank, rank_container in enumerate(file_group):
+            if (rank_container == None):
+                assert game_copy.gameTable[file][rank] == None
+            else:
+                old_piece = rank_container
+                new_piece = game_copy.gameTable[file][rank]
+                assert old_piece.symbol == new_piece.symbol
+                assert old_piece.color == new_piece.color
+                assert old_piece.position == new_piece.position
+    
+    for i, piece in enumerate(game.whitePieces):
+        assert piece.symbol == game_copy.whitePieces[i].symbol
+        assert piece.color == game_copy.whitePieces[i].color
+        assert piece.position == game_copy.whitePieces[i].position
+
+    for i, piece in enumerate(game.blackPieces):
+        assert piece.symbol == game_copy.blackPieces[i].symbol
+        assert piece.color == game_copy.blackPieces[i].color
+        assert piece.position == game_copy.blackPieces[i].position
+    
+    assert game_copy.move('E6 to D7') == 'check'
+

@@ -13,7 +13,9 @@ class Piece:
         self.movementRule = movementRule
 
     def fullCopy(self):
-        return Piece(self.position.fullCopy(), self.color, self.symbol, self.movementRule.fullCopy())
+        position_copy = None if self.position == None else self.position.fullCopy()
+        movementRule_copy = None if self.movementRule == None else self.movementRule.fullCopy()
+        return Piece(position_copy, self.color, self.symbol, movementRule_copy)
 
     def isAttacking(self, square, game):
         assert isinstance(square, Square)

@@ -49,9 +49,10 @@ class Game:
         for i in range(0, len(self.blackPieces)):
             piece_map[self.blackPieces[i]] = game_copy.blackPieces[i]
         game_copy.gameTable = [[None for i in range(0, 8)] for j in range(0, 8)]
-        for piece in game_copy.whitePieces + game_copy.blackPieces:
-            if (not piece.taken):
-                game_copy.gameTable[piece.position.file][piece.position.rank] = piece
+        for file, file_group in enumerate(self.gameTable):
+            for rank, rank_container in enumerate(file_group):
+                if (rank_container != None):
+                    game_copy.gameTable[file][rank] = piece_map[rank_container]
         game_copy.turn = self.turn
         game_copy.moveHistory = [record.fullCopy(piece_map) for record in self.moveHistory]
         game_copy.boardTemplate = self.boardTemplate
@@ -245,6 +246,8 @@ class Game:
         king = self._getKing(color)
         if (color == WHITE):
             for piece in self.blackPieces:
+                print("piece:" + str(piece.position))
+                print("king: " + str(king.position) + "\n")
                 if (not piece.taken) and self.isAttacking(Move(piece.position, king.position)):
                     return True
             return False

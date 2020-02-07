@@ -17,6 +17,10 @@ class King(Piece):
             return True
         else:
             return False
+        
+    def fullCopy(self):
+        position_copy = None if self.position == None else self.position.fullCopy()
+        return King(position_copy, self.color, self.symbol)
 
     def allAttackingMoves(self, game):
         startFile = max([0, self.position.file - 1])

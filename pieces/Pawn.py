@@ -10,6 +10,10 @@ class Pawn(Piece):
     def __init__(self, position, color, symbol='pa'):
         Piece.__init__(self, position, color, symbol, None)
 
+    def fullCopy(self):
+        position_copy = None if self.position == None else self.position.fullCopy()
+        return Pawn(position_copy, self.color, self.symbol)
+
     def isAttacking(self, square, game):
         if self.taken:
             return False

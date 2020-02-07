@@ -88,7 +88,7 @@ class ChessBoard:
         self.myCanvas.tag_bind("undo", '<Button-1>', self.undoLastMove)
 
     def aiMakeMove(self, event):
-        ai = Ai(3)
+        ai = Ai(3, 2)
         print(self.myGame.move(ai.bestMove(self.myGame)))
         self.reMapPieces()
 

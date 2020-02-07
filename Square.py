@@ -13,6 +13,8 @@ class Square:
         return Square(self.file, self.rank)
 
     def __eq__(self, other):
+        if (other == None):
+            return False
         return self.file == other.file and self.rank == other.rank
         
     def __str__(self):
